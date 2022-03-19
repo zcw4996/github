@@ -87,14 +87,14 @@ scan_done(void *arg, STATUS status)
       {
     	  break;
       }
-      DNS_SERVER_DEBUG("(\"%s\",%d)\r\n",
-    		  bss_link->ssid, bss_link->rssi);
+     // DNS_SERVER_DEBUG("(\"%s\",%d)\r\n",
+    //		  bss_link->ssid, bss_link->rssi);
       bss_link = bss_link->next.stqe_next;
     }
     os_memcpy(ApInfTemp1,ApInfTemp, os_strlen(ApInfTemp)); /* 拷贝 AP信息 */
-    DNS_SERVER_DEBUG("ApInfTemp Len = %d\n",os_strlen(ApInfTemp));
+   // DNS_SERVER_DEBUG("ApInfTemp Len = %d\n",os_strlen(ApInfTemp));
     ApInfTemp1[os_strlen(ApInfTemp)] = '\0';
-    DNS_SERVER_DEBUG("Scan Succeed\n");
+    //DNS_SERVER_DEBUG("Scan Succeed\n");
   }
   else
   {
@@ -2382,7 +2382,7 @@ extern uint8 LastChannel;
     struct espconn *pespconn = arg;
     //char *tempSaveData = NULL;
 
-   DNS_SERVER_DEBUG("Received data: %s \r\n", pusrdata);    //打印收到的数据
+   //DNS_SERVER_DEBUG("Received data: %s \r\n", pusrdata);    //打印收到的数据
 
 
 
@@ -2462,7 +2462,7 @@ extern uint8 LastChannel;
 			    &&(APName_Point != NULL ) &&(TcpPort != NULL) \
 			   && (APPswd_Point != NULL))
 	   {
-	    DNS_SERVER_DEBUG("Received data: %s \r\n", pusrdata);
+	    //DNS_SERVER_DEBUG("Received data: %s \r\n", pusrdata);
         //return;
 		   APName_Point = APName_Point + 8;
 		   APName_len = APPswd_Point - APName_Point;  //获取AP名字的长度

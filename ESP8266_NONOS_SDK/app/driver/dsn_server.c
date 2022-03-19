@@ -57,9 +57,9 @@ static struct espconn *client_esp_conn;
 *******************************************************************************/
 void  dns_server_recv(void *arg, char *pusrdata, unsigned short len)
 {
-	uint32 IP_addr[4] = {0,0,0,0};      //閻€劋浜掔€涙ê鍋嶇憴锝嗙€芥總鐣屾畱IP閸︽澘娼�
+	uint32 IP_addr[4] = {0,0,0,0};      //闁烩偓鍔嬫禍鎺斺偓娑櫭崑宥囨喆閿濆棛鈧姤绺介悾灞剧暠IP闁革附婢樺锟�
     uint32 Auto_Web_State = 0;
- #if defined(GLOBAL_DEBUG)
+ #if 0
     DNS_SERVER_DEBUG("dns data:");
     for(dns_i = 0;dns_i < len; dns_i ++)
     {
@@ -91,22 +91,22 @@ void  dns_server_recv(void *arg, char *pusrdata, unsigned short len)
     Spi_FlashRead(IS_AUTO_WEB_Erase,IS_AUTO_WEB_ERASE_OFFSET,&Auto_Web_State,4);
     if(Auto_Web_State == NO_AUTO_ACCESS_WEB)
     {
-    	DNS_SERVER_DEBUG("NO_AUTO_ACCESS_WEB\n");
+    	//DNS_SERVER_DEBUG("NO_AUTO_ACCESS_WEB\n");
     	if(strstr(pusrdata+0xc,"www.GX_NTP.com"))
     	{
-          DNS_SERVER_DEBUG("www.GX_NTP.com\n");
+         // DNS_SERVER_DEBUG("www.GX_NTP.com\n");
     	}
     	else if(strstr(pusrdata+0xc,"GX_NTP"))
     	{
-    		DNS_SERVER_DEBUG("GX_NTP\n");
+    	//	DNS_SERVER_DEBUG("GX_NTP\n");
     	}
     	else if(strstr(pusrdata+0xc,"www.gx_ntp.com"))
     	{
-    		DNS_SERVER_DEBUG("www.gx_ntp.com\n");
+    	//	DNS_SERVER_DEBUG("www.gx_ntp.com\n");
     	}
     	else if(strstr(pusrdata+0xc,"gx_ntp"))
     	{
-    		DNS_SERVER_DEBUG("gx_ntp\n");
+    	//	DNS_SERVER_DEBUG("gx_ntp\n");
     	}
     	else
     	{
@@ -152,7 +152,7 @@ void  dns_server_recv(void *arg, char *pusrdata, unsigned short len)
 
     dns_buf[len++] =0x00;
     dns_buf[len++] =0x04;
-	Spi_FlashRead(LOCAL_Erase,LOCAL_IP_ERASE_OFFSET,IP_addr,4);  //娴犲穳lash娑擃叀顕伴崣鏍ㄦ拱閸︾檺P 缂冩垵鍙� 鐎涙劗缍夐幒鈺冪垳
+	Spi_FlashRead(LOCAL_Erase,LOCAL_IP_ERASE_OFFSET,IP_addr,4);  //濞寸姴绌砽ash濞戞搩鍙€椤曚即宕ｉ弽銊︽嫳闁革妇妾篜 缂傚啯鍨甸崣锟� 閻庢稒鍔楃紞澶愬箳閳哄啰鍨�
     dns_buf[len++] = (char)IP_addr[0];
     dns_buf[len++] = (char)IP_addr[1];
     dns_buf[len++] = (char)IP_addr[2];
@@ -160,7 +160,7 @@ void  dns_server_recv(void *arg, char *pusrdata, unsigned short len)
 
     espconn_send(client_esp_conn, dns_buf, len);
 
-    DNS_SERVER_DEBUG("DNS respons request");
+    //DNS_SERVER_DEBUG("DNS respons request");
 }
 
 ip_addr_t esp_server_ip;
@@ -172,21 +172,21 @@ user_esp_platform_dns_found(const char *name, ip_addr_t *ipaddr, void *arg)
  {
 	int32_t TcpPort = 0,TcpType;
  	Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVER_PORT_ERASE_OFFSET, &TcpPort,1);
-	Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVER_TPYE_ERASE_OFFSET, &TcpType,1);/* 閼惧嘲褰囬梹鑳箾閹恒儴绻曢弰顖滅叚鏉╃偞甯� */
+	Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVER_TPYE_ERASE_OFFSET, &TcpType,1);/* 闁兼儳鍢茶ぐ鍥⒐閼愁垳绠鹃柟鎭掑劥缁绘洟寮伴婊呭彋閺夆晝鍋炵敮锟� */
 
-    DNS_SERVER_DEBUG("user_esp_platform_dns_found %d.%d.%d.%d\n",
-		 ipaddr->addr & 0xFF,(ipaddr->addr >> 8) & 0xFF,(ipaddr->addr >> 16) & 0xFF,(ipaddr->addr >> 24) & 0xFF);
+    //DNS_SERVER_DEBUG("user_esp_platform_dns_found %d.%d.%d.%d\n",
+	//	 ipaddr->addr & 0xFF,(ipaddr->addr >> 8) & 0xFF,(ipaddr->addr >> 16) & 0xFF,(ipaddr->addr >> 24) & 0xFF);
          TcpClientToServer[0] =(char) (ipaddr->addr);
          TcpClientToServer[1] =(char) ((ipaddr->addr >> 8) & 0xFF);
          TcpClientToServer[2] =(char) ((ipaddr->addr >> 16) & 0xFF);
          TcpClientToServer[3] =(char) ((ipaddr->addr >> 24) & 0xFF);
          if(TcpType != 'L')
          {
-              /* 閻叀绻涢幒銉ュ灟閸︺劋瑕嗛崣锝勮厬鐎瑰本鍨氭潻鐐村复 */
+              /* 闁活収鍙€缁绘盯骞掗妷銉ョ仧闁革负鍔嬬憰鍡涘矗閿濆嫯鍘悗鐟版湰閸ㄦ碍娼婚悙鏉戝 */
          }
          else
          {
-           AP_tcpclient_init(TcpClientToServer,TcpPort);/* 闂€鑳箾閹恒儱鍨粩瀣煝鏉╃偞甯� */
+           AP_tcpclient_init(TcpClientToServer,TcpPort);/* 闂傗偓閼愁垳绠鹃柟鎭掑劚閸垳绮╃€ｎ亜鐓濋弶鈺冨仦鐢拷 */
          }
  }
 

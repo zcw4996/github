@@ -164,15 +164,12 @@ void ICACHE_FLASH_ATTR vLink_AP(uint32 AP_ID)
 			 for(i = 0; i < APNAME_len; i ++)
 			  {
 				APname1[i] = (uint8 )APname[i];
-				DNS_SERVER_DEBUG("%c",APname1[i]);
 			  }
-			   DNS_SERVER_DEBUG("\nAppasw = ");
 			 for(i = 0; i < APPSWD_len; i ++)
 			  {
 				APpasw1[i] = (uint8 )APpasw[i];
-				DNS_SERVER_DEBUG("%c",APpasw1[i]);
 			  }
-			 DNS_SERVER_DEBUG("\n");
+			 DNS_SERVER_DEBUG("ssid = %s,pasd = %s\n",APname1,APpasw1);
 			 user_set_station_config(APname1,APpasw1,8,12);  //连接相应的AP
 			 //user_set_station_config("OnePlus5","181701408444",8,12);
 			 spi_flash_erase_sector (AP_NUM_Erase);
@@ -214,20 +211,17 @@ void ICACHE_FLASH_ATTR vGetStaticIP(uint8 mode)
 		if(Pswdlen > 0)
 		{
 		 Spi_FlashRead(LOCALSSID_Erase,PSWD_ERASE_OFFSET,Pswd,Pswdlen);
+		 
 		 for(i = 0 ;i < Pswdlen;i ++)
 		 {
 			 Pswd1[i] = (char )Pswd[i];
-			 DNS_SERVER_DEBUG("%c", Pswd1[i]);
 		 }
 		}
 		 for(i = 0 ;i < SSIDlen;i ++)
 		 {
 			 SSID1[i] = (char )SSID[i];
-			 DNS_SERVER_DEBUG("%c", SSID1[i]);
 		 }
-		 DNS_SERVER_DEBUG("\n");
-
-		 DNS_SERVER_DEBUG("\n");
+		 DNS_SERVER_DEBUG("ssid = %s,pswd = %s",SSID1,Pswd1);
 	 }
 
 

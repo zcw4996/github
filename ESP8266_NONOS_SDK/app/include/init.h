@@ -14,7 +14,7 @@
 #define GLOBAL_DEBUG
  
 #if defined(GLOBAL_DEBUG)
-#define DNS_SERVER_DEBUG(format, ...) os_printf("[%s:%d]" format "\r\n", __FILE__,__LINE__,##__VA_ARGS__)
+#define DNS_SERVER_DEBUG(format, ...) os_printf("[%s:%d]" format "", __FILE__,__LINE__,##__VA_ARGS__)
 #else
 #define DNS_SERVER_DEBUG(format, ...) 
 #endif

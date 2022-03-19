@@ -116,10 +116,11 @@ void to_scan(void)
 	uart0_init(&Uart0CB);  //串口0初始化，注意串口0的收发FIFO是128字节，发送数据的时候，不要溢出
 	UART_SetPrintPort( UART1 );  /* ESP8266内部信息打印口设置为串口1*/
     Spi_FlashRead(Init_Erase, 0,&If_Init_Set, 1);  //是否需要恢复到出厂设置
+    DNS_SERVER_DEBUG("version = %s\n",VERSION);
     if(If_Init_Set != INIT_NO_SET)  //恢复到出厂设置
     {
       RecoveryData();
-      //os_printf("huifuchuchangshezhi\n");
+      DNS_SERVER_DEBUG("huifuchuchangshezhi\n");
      }
 
       ConfigEsp82663(NULL);
