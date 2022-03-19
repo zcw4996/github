@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//app/driver/dsn_server.c=UTF-8
+encoding//app/driver/spi_olcd.c=UTF-8
+encoding//app/driver/tcpclient.c=UTF-8
+encoding//app/driver/tcpserver.c=UTF-8

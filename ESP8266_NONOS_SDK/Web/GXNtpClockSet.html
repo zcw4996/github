@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        .tui-checkbox:checked {
+            background:black
+        }
+        .tui-checkbox {
+            width:18px;
+            height:18px;
+            background-color:#ffffff;
+            border:solid 1px #dddddd;
+            -webkit-border-radius:50%;
+            border-radius:50%;
+            font-size:0.8rem;
+            margin:0;
+            padding:0;
+            position:relative;
+            display:inline-block;
+            vertical-align:top;
+            cursor:default;
+            -webkit-appearance:none;
+            -webkit-user-select:none;
+            user-select:none;
+            -webkit-transition:background-color ease 0.1s;
+            transition:background-color ease 0.1s;
+        }
+        .class1{
+            font-size: 25px;
+            text-align: center;
+        }
+        .class2{
+            font-size: 15px;
+            text-align: center;
+        }
+        .class3{
+            font-size: 15px;
+            /*font-family: Microsoft JhengHei;*/
+        }
+        .class4{
+            font-weight: 550;
+            font-size: 15px;
+            font-family: STHeiti;
+        }
+        #b{
+            margin:0px auto
+        }
+        .btns {
+            width:120px; height:35px; color: black }
+
+    </style>
+    <script language="javascript">
+        function custom_close(){
+            if(confirm("您确定要关闭本页吗？")){
+                window.open("about:blank","_self").close()
+            }
+            else{
+            }
+        }
+    </script>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+</head>
+<body style="background-color: grey">
+<p class="class1">GX-NTP Clock Setup</p>
+
+<div id="b">
+<form class="class3" method="post"  id="aform">
+    <table  align="center">
+<!--        <tr >-->
+<!--            <td class="class4"> Auto Access Settings </td>-->
+<!--        </tr>-->
+        <tr>
+        <td ><strong>士大夫</strong><br></td>
+        <td>Yes:<input type="radio"  value="1"  name="DHCP_State" checked >&nbsp;No:<input type="radio"  value="2" name="DHCP_State" ><br></td>
+        </tr>
+        <tr >
+            <td class="class4"> Router Connection Setting </td>
+        </tr>
+        <tr >
+            <td> AP_Name:  </h5></td>
+            <td> <input type="text" value="苹果" id="AP_Name" onkeyup="value=value.replace(/[\u4e00-\u9fa5]/ig,'')" name="AP_Name" id="AP_Name" list="AP_Name_list" style="width:154px;"  maxlength="32">    <!--datalist需要和input搭配使用，可以输入数据，也可以从列表中选择-->
+            <datalist id="AP_Name_list">
+                <select name="AP_Name">
+                <option >Åland Islands</option>
+                <option>Albania</option>
+                <option >Algeria</option>
+                <option >American Samoa</option>
+                </select>>
+            </datalist></td>
+        </tr>
+        <tr >
+            <td> AP_Password:  </h5></td>
+            <td><input type="password"   oninput="value=value.replace(/[^\d]/g,'')" name="AP_Password"id="pwd4" maxlength="30"> <input type="checkbox" class="tui-checkbox" onchange="changePwd4Visible()" ></td>
+        </tr>
+        <tr >
+             <td><br>IP addr:</td>
+            <td><br><input type="text"   required="required" oninput="value=value.replace(/[^\d.]/g,'')" value="192.168.4.1" name="IP_addr"  maxlength="15"></td>
+        </tr>
+        <tr>
+            <td>Subnet mask:</td>
+            <td><input type="text"  value="255.255.255.0" name="Subnet_mask" maxlength="15"></td>
+        </tr>
+        <tr>
+            <td>Gateway:<br><br></td>
+            <td><input type="text"  value="192.168.4.1" name="Gateway"  maxlength="15"><br><br></td>
+        </tr>
+        <tr>
+           <td>TCP Server IP:</td>
+           <td><input type="text" id="name01" value="%s" name="TCP_Server_IP" style="width:130px;" maxlength="20" oninput = "value=value.replace(/[\u4e00-\u9fa5]/ig,'')" readonly>
+               <input type="checkbox" id="checkid" class="tui-checkbox " onclick="csan()"  name="kjLevel" checked/></td>
+        </tr>
+        <tr>
+            <td>TCP Server Port:<br><br></td>
+            <td><input type="text"  value="%s" id="name02" name="TCP_Server_Port" style="width:54px;" maxlength="5" readonly oninput = "value=value.replace(/[^\d]/g,'')">
+                <select name="Tcp_Type">
+                <option selected= "selected"  value="Sh22ort connection">Short connection</option>
+                <option>Long connection</option>
+            </select><br><br></td>
+        </tr>
+        <tr >
+            <td class="class4"> Network Setting </td>
+        </tr>
+        <tr>
+            <td>Ntp Server: </td>
+            <td><input type="text"  value="cn.ntp.org.cn" id="Ntp_Server" onkeyup="value=value.replace(/[\u4e00-\u9fa5]/ig,'')" name="Ntp_Serve" maxlength="20" list="saleslist" />
+            <datalist id="saleslist" >
+                <option>cn.ntp.org.cn</option>
+                <option>edu.ntp.org.cn</option>
+                <option>hk.ntp.org.cn</option>
+                <option>tw.ntp.org.cn</option>
+                <option>us.ntp.org.cn</option>
+                <option>sgp.ntp.org.cn</option>
+                <option>kr.ntp.org.cn</option>
+                <option>jp.ntp.org.cn</option>
+                <option>de.ntp.org.cn</option>
+                <option>ina.ntp.org.cn</option>
+            </datalist></td>
+        </tr>
+        <tr>
+            <td>Time Output Interva:  </td>
+            <td><input type="text" value="10" name="Time_Output_Interva" maxlength="4" required="required"  oninput = "value=value.replace(/[^\d]/g,'')"></td>
+        </tr>
+        <tr>
+            <td>SSID:</td>
+            <td><input type="text"  required="required" onkeyup="value=value.replace(/[\u4e00-\u9fa5]/ig,'')" value="GxLEDS_NP" name="SSID" maxlength="30"></td>
+        </tr>
+        <tr>
+            <td class="class4"><br>DST Setting </td><td><br></td>
+        </tr>
+        <tr>
+            <td>Timezone: </td>
+            <td>
+            <select name="Timezone" required="required">
+                <option></option >
+                <option>1:00</option>
+                <option>2:00</option>
+                <option>3:00</option>
+                <option>3:30</option>
+                <option>4:00</option>
+                <option>4:30</option>
+                <option>5:00</option>
+                <option>5:30</option>
+                <option>6:00</option>
+                <option>6:30</option>
+                <option>7:00</option>
+                <option selected= "selected">8:00</option>
+                <option>9:00</option>
+                <option>9:30</option>
+                <option>10:00</option>
+                <option>10:30</option>
+                <option>11:00</option>
+                <option>11:30</option>
+                <option>12:00</option>
+                <option>12:45</option>
+                <option>13:00</option>
+                <option>14:00</option>
+                <option>-1:00</option>
+                <option>-2:00</option>
+                <option>-3:00</option>
+                <option>-3:30</option>
+                <option>-4:00</option>
+                <option>-5:00</option>
+                <option>-6:00</option>
+                <option>-7:00</option>
+                <option>-8:00</option>
+                <option>-9:00</option>
+                <option>-9:30</option>
+                <option>-10:00</option>
+                <option>-11:00</option>
+                <option>-12:00</option>
+            </select></td>
+        </tr>
+        <tr>
+        <td>Brightness: </td>
+        <td><input type="text" value="Brilliant" name="Brightness"></td>
+    </tr>
+        <tr>
+            <td>DST Starts:hour</td>
+            <td><select name="hourStart">
+                <option selected= "selected">0</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+                <option>11</option>
+                <option>12</option>
+                <option>13</option>
+                <option>14</option>
+                <option>15</option>
+                <option>16</option>
+                <option>17</option>
+                <option>18</option>
+                <option>19</option>
+                <option>20</option>
+                <option>21</option>
+                <option>22</option>
+                <option>23</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td>DST Starts:Data </td>
+            <td><select name="WeekendSelectStart">
+                <option selected= "selected">1st</option>
+                <option>2nd</option>
+                <option>3rd</option>
+                <option>4th</option>
+                <option>5th</option>
+                <option>last</option>
+            </select>
+            <select name="DST_Week_Start">
+            <option selected= "selected">Sun</option>
+            <option>Mon</option>
+            <option>Tue</option>
+            <option>Wed</option>
+            <option>Thu</option>
+            <option>Fri</option>
+            <option>Sat</option>
+            </select>
+            <select name="DST_Mon_Start">
+                <option selected= "selected">Jan</option>
+                <option>Feb</option>
+                <option>Mar</option>
+                <option>Apr</option>
+                <option>May</option>
+                <option>Jun</option>
+                <option>Jul</option>
+                <option>Aug</option>
+                <option>Sep</option>
+                <option>Oct</option>
+                <option>Nov</option>
+                <option>Dec</option>
+            </select></td>
+    </tr>
+        <tr>
+            <td>DST Ends:hour</td>
+            <td><select name="hourEnd">
+                <option selected= "selected">0</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+                <option>11</option>
+                <option>12</option>
+                <option>13</option>
+                <option>14</option>
+                <option>15</option>
+                <option>16</option>
+                <option>17</option>
+                <option>18</option>
+                <option>19</option>
+                <option>20</option>
+                <option>21</option>
+                <option>22</option>
+                <option>23</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td>DST Ends:Data </td>
+            <td><select name="WeekendSelectEnd">
+                <option selected= "selected">1st</option>
+                <option>2nd</option>
+                <option>3rd</option>
+                <option>4th</option>
+                <option>5th</option>
+                <option>last</option>
+            </select>
+             <select name="DST_Week_End">
+                    <option selected= "selected">Sun</option>
+                    <option>Mon</option>
+                    <option>Tue</option>
+                    <option>Wed</option>
+                    <option>Thu</option>
+                    <option>Fri</option>
+                    <option>Sat</option>
+             </select>
+              <select name="DST_Mon_End">
+                    <option selected= "selected">Jan</option>
+                    <option>Feb</option>
+                    <option>Mar</option>
+                    <option>Apr</option>
+                    <option>May</option>
+                    <option>Jun</option>
+                    <option>Jul</option>
+                    <option>Aug</option>
+                    <option>Sep</option>
+                    <option>Oct</option>
+                    <option>Nov</option>
+                    <option>Dec</option>
+                </select></td>
+        <tr >
+        <td>Language Choice</td>
+            <td><select name="language">
+                <option selected= "selected">English</option>
+                <option>中文</option>
+            </select></td>
+        </tr>
+        <tr >
+            <td><br></td>
+            <td><br> </td>
+        </tr>
+
+        <tr >
+            <td><input  type="submit" class="btns" name="Save1" value="Save1" ></td>
+            <form  method="get"><td> <input  type="submit" class="btns" name="Reset" value="Reset2" novalidate="novalidate"> </td></form>
+        </tr>
+    </table>
+</form>
+</div>
+<script>
+    window.onload =csan();
+    var pwd4 = document.getElementById("pwd4");
+    var pwd5 = document.getElementById("pwd5");
+    function changePwd4Visible() {
+        pwd4.type = event.target.checked ? "text" : "password";
+    }
+    function changePwd5Visible() {
+        pwd5.type = event.target.checked ? "text" : "password";
+    }
+
+    function csan(){
+        var id2=document.getElementById("checkid");
+        if(id2.checked){
+            document.getElementById("name01").readOnly=false;
+            document.getElementById("name02").readOnly=false;
+        }else{
+            document.getElementById("name01").value="";
+            document.getElementById("name01").readOnly=true;
+            document.getElementById("name02").value="";
+            document.getElementById("name02").readOnly=true;
+        }
+    }
+</script>
+<br><br><br>
+</body>
+</html>
+
