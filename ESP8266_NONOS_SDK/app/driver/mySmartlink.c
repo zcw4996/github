@@ -1,7 +1,7 @@
 /*
  * mySmartlink.c
  *
- *  Created on: 2017Äê2ÔÂ8ÈÕ
+ *  Created on: 2017å¹´2æœˆ8æ—¥
  *      Author: dell
  */
 
@@ -12,14 +12,15 @@
 #include "spi_flash.h"
 #include "soft_timer.h"
 #include "tcpserver.h"
-uint32 IsDst;//¼ÇÂ¼ÊÇ·ñĞèÒªÉèÖÃÏÄÁîÊ±
-uint8 AlreadStartPutTime = 0;/* ¼ÇÂ¼ÊÇ·ñÒÑ¾­³É¹¦´ÓNTP·şÎñÆ÷»ñÈ¡Ê±¼ä */
+#include "init.h"
+uint32 IsDst;//è®°å½•æ˜¯å¦éœ€è¦è®¾ç½®å¤ä»¤æ—¶
+uint8 AlreadStartPutTime = 0;/* è®°å½•æ˜¯å¦å·²ç»æˆåŠŸä»NTPæœåŠ¡å™¨è·å–æ—¶é—´ */
 Dst_Packet Ntp_Data1;
 uint8_t PackSend[18] = {0x1f,0x30,0x6d,0,0,0,0,0,0,0,0,0,0,0,0,0,0x09,0};
 void Spi_FlashRead(uint32 Erase_Point,uint32 Erase_Offset,uint32 * data_point,uint32 data_len);
 void SetDst(DstPacket * Dststart,DstPacket*Dstend,Dst_Packet*Ntp_data);
 void DealwithNtpStr(char *NtpData,Dst_Packet *DstData);
-LOCAL os_timer_t sntp_timer;//smartconfig_timer; //¶¨ÒåÒ»¸ö¶¨Ê±Æ÷½á¹¹£¬ÖÇÄÜÁ¬½Ó¹ı³ÌÖĞ£¬¿ØÖÆLEDÉÁË¸£¬Æğµ½Ö¸Ê¾µÄ×÷ÓÃ
+LOCAL os_timer_t sntp_timer;//smartconfig_timer; //å®šä¹‰ä¸€ä¸ªå®šæ—¶å™¨ç»“æ„ï¼Œæ™ºèƒ½è¿æ¥è¿‡ç¨‹ä¸­ï¼Œæ§åˆ¶LEDé—ªçƒï¼Œèµ·åˆ°æŒ‡ç¤ºçš„ä½œç”¨
 extern uint32_t TimeOutInterva;
 extern  uint8_t isLedClose;
 void ICACHE_FLASH_ATTR DealwithNtpStr(char *NtpData,Dst_Packet *DstData)
@@ -95,16 +96,16 @@ void ICACHE_FLASH_ATTR DealwithNtpStr(char *NtpData,Dst_Packet *DstData)
 	  DstData -> Dst_year = DstData -> Dst_year * 10;
 	  DstData -> Dst_year =  (uint32)((uint32)NtpData[i + 20] - 0x30 + DstData -> Dst_year);
    }
-   DstData -> Dst_week = Get_Week(DstData -> Dst_year,DstData -> Dst_month,DstData -> Dst_day); /* ²ÌÀÖ¹«Ê½»ñÈ¡ĞÇÆÚ */
-  // os_printf("DstData = %d-%d-%d-%d-%d-%d-%d\n",DstData -> Dst_year,DstData ->Dst_month,DstData -> Dst_day, DstData -> Dst_hour, DstData -> Dst_min, DstData -> Dst_sec,DstData->Dst_week);
+   DstData -> Dst_week = Get_Week(DstData -> Dst_year,DstData -> Dst_month,DstData -> Dst_day); /* è”¡ä¹å…¬å¼è·å–æ˜ŸæœŸ */
+   DNS_SERVER_DEBUG("DstData = %d-%d-%d-%d-%d-%d-%d\n",DstData -> Dst_year,DstData ->Dst_month,DstData -> Dst_day, DstData -> Dst_hour, DstData -> Dst_min, DstData -> Dst_sec,DstData->Dst_week);
 }
-/*·µ»ØÕâ¸öÔÂµÄµÚ¼¸ÖÜ*/
+/*è¿”å›è¿™ä¸ªæœˆçš„ç¬¬å‡ å‘¨*/
 uint32 ICACHE_FLASH_ATTR ReturnMonSelWeek(Dst_Packet*Ntp_data2)
 {
 	uint32  week,year,century,month,day = 1;
 	uint32 period = 1;
 
-	/*ÅĞ¶Ï¸ÃÔÂµÚÒ»ÌìÊÇĞÇÆÚ¼¸*/
+	/*åˆ¤æ–­è¯¥æœˆç¬¬ä¸€å¤©æ˜¯æ˜ŸæœŸå‡ */
 	century = (*Ntp_data2).Dst_year/100;
 	year = (*Ntp_data2).Dst_year%100;
 	month = (*Ntp_data2).Dst_month;
@@ -124,12 +125,12 @@ uint32 ICACHE_FLASH_ATTR ReturnMonSelWeek(Dst_Packet*Ntp_data2)
 		period -= 1;
 	}
 //	printf("%d\n",week);
-	/*ÅĞ¶Ï¸ÄÈÕÊÇ±¾ÔÂµÚ¼¸ÖÜ*/
+	/*åˆ¤æ–­æ”¹æ—¥æ˜¯æœ¬æœˆç¬¬å‡ å‘¨*/
 	while(day < (*Ntp_data2).Dst_day)
 	{
 		day ++;
 		week ++;
-		if(week == 7)	//Ã¿µ½ĞÇÆÚÈÕÖÜÊı¼ÓÒ»
+		if(week == 7)	//æ¯åˆ°æ˜ŸæœŸæ—¥å‘¨æ•°åŠ ä¸€
 		{
 			period++;
 			week = 0;
@@ -138,16 +139,16 @@ uint32 ICACHE_FLASH_ATTR ReturnMonSelWeek(Dst_Packet*Ntp_data2)
 
 	return period;
 }
-/*ÒÑÖªNtp_data.Dst_year,Ntp_data.Dst_month,Dst_Inf.Dst_WeekSel,Dst_Inf.Dst_Week*/
-/*Äê£¬ÔÂ£¬µÚ¼¸¸öĞÇÆÚ£¬ĞÇÆÚÒÑÖª*/
-/*·µ»Ø ÏàÓ¦ÈÕÆÚ */
+/*å·²çŸ¥Ntp_data.Dst_year,Ntp_data.Dst_month,Dst_Inf.Dst_WeekSel,Dst_Inf.Dst_Week*/
+/*å¹´ï¼Œæœˆï¼Œç¬¬å‡ ä¸ªæ˜ŸæœŸï¼Œæ˜ŸæœŸå·²çŸ¥*/
+/*è¿”å› ç›¸åº”æ—¥æœŸ */
 uint32 ReturnMonSelDate(Dst_Packet *Ntp_data,DstPacket *Dst_Inf)
 {
 	int  week,year,century,month,day = 1;
 	unsigned int period = 1;
 
 
-	/*ÅĞ¶Ï¸ÃÔÂµÚÒ»ÌìÊÇĞÇÆÚ¼¸*/
+	/*åˆ¤æ–­è¯¥æœˆç¬¬ä¸€å¤©æ˜¯æ˜ŸæœŸå‡ */
 	century = (*Ntp_data).Dst_year/100;
 	year = (*Ntp_data).Dst_year%100;
 	month = (*Ntp_data).Dst_month;
@@ -257,7 +258,7 @@ int ICACHE_FLASH_ATTR GetMonthDays(int year,int month)
             }
             break;
         default:
-            //os_printf("month error!");
+            DNS_SERVER_DEBUG("month error!");
             return 0;
             break;
     }
@@ -268,11 +269,11 @@ void ICACHE_FLASH_ATTR SetDst(DstPacket * Dststart,DstPacket*Dstend,Dst_Packet*N
     uint32 DstStartWelSelData = 0,DstEndWelSelData = 0;
 
 
-	//µ½ÁËÏÄÁîÊ±¿ªÊ¼Ê±¼ä
+	//åˆ°äº†å¤ä»¤æ—¶å¼€å§‹æ—¶é—´
 	if((Ntp_data->Dst_month) > (Dststart -> Dst_Mon) &&  (Ntp_data->Dst_month) < (Dstend -> Dst_Mon))
 	{
 		DstIsstart = DST_STRAT;
-		if(Ntp_data->Dst_month + 1 == Dstend -> Dst_Mon)/* ¿¼ÂÇ¼«ÏŞÇé¿ö ÔÚÒ»ºÅµÄÁãµã½áÊøÏÄÁîÊ± */
+		if(Ntp_data->Dst_month + 1 == Dstend -> Dst_Mon)/* è€ƒè™‘æé™æƒ…å†µ åœ¨ä¸€å·çš„é›¶ç‚¹ç»“æŸå¤ä»¤æ—¶ */
 	   {
 			if(Dstend -> Dst_Hour == 0)
 			{
@@ -319,7 +320,7 @@ void ICACHE_FLASH_ATTR SetDst(DstPacket * Dststart,DstPacket*Dstend,Dst_Packet*N
 	{
 	    DstEndWelSelData = ReturnMonSelDate(Ntp_data,Dstend);
 
-		if(Ntp_data ->Dst_day < DstEndWelSelData)  /* ¿¼ÂÇ¼«ÏŞÇé¿ö ÔÚ·ÇÒ»ºÅµÄÁãµã½áÊøÏÄÁîÊ± */
+		if(Ntp_data ->Dst_day < DstEndWelSelData)  /* è€ƒè™‘æé™æƒ…å†µ åœ¨éä¸€å·çš„é›¶ç‚¹ç»“æŸå¤ä»¤æ—¶ */
 		{
 			DstIsstart = DST_STRAT;
 			if(Ntp_data ->Dst_day + 1 == DstEndWelSelData)
@@ -355,7 +356,7 @@ void ICACHE_FLASH_ATTR SetDst(DstPacket * Dststart,DstPacket*Dstend,Dst_Packet*N
 		DstIsstart = DST_FINISH;
 	}
 
-	if(DstIsstart == DST_STRAT)  /* Èí¼ş¸üĞÂÏÄÁîÊ±Ê±¼ä  */
+	if(DstIsstart == DST_STRAT)  /* è½¯ä»¶æ›´æ–°å¤ä»¤æ—¶æ—¶é—´  */
 	{
 		Ntp_data ->Dst_hour ++;
 		if(Ntp_data ->Dst_hour == 24)
@@ -378,8 +379,8 @@ void ICACHE_FLASH_ATTR SetDst(DstPacket * Dststart,DstPacket*Dstend,Dst_Packet*N
 			else
 			{
 				if(Ntp_data ->Dst_month == 2)
-				{     /* ÈòÄê */
-					if((Ntp_data->Dst_year%400 == 0)||(Ntp_data->Dst_year%4 == 0 && Ntp_data->Dst_year%100 != 0))//ÈòÄê
+				{     /* é—°å¹´ */
+					if((Ntp_data->Dst_year%400 == 0)||(Ntp_data->Dst_year%4 == 0 && Ntp_data->Dst_year%100 != 0))//é—°å¹´
 					{
 						if( Ntp_data ->Dst_day == 30)
 						{
@@ -426,20 +427,20 @@ void ICACHE_FLASH_ATTR SetDst(DstPacket * Dststart,DstPacket*Dstend,Dst_Packet*N
 
 }
 /****************************************************************************
-* Ãû    ³Æ£ºu8 Get_Week(u16 Year,u16 Month,u16 Date)
-* ¹¦    ÄÜ£ºÓÃ²ÌÀÕ£¨Zeller£©¹«Ê½¼ÆËãĞÇÆÚ¼¸
+* å    ç§°ï¼šu8 Get_Week(u16 Year,u16 Month,u16 Date)
+* åŠŸ    èƒ½ï¼šç”¨è”¡å‹’ï¼ˆZellerï¼‰å…¬å¼è®¡ç®—æ˜ŸæœŸå‡ 
 
-	w=y+[y/4]+[c/4]-2c+[26£¨m+1£©/10]+d-1
+	w=y+[y/4]+[c/4]-2c+[26ï¼ˆm+1ï¼‰/10]+d-1
 
-	È»ºów¶Ô7È¡Óà¡£
-	¹«Ê½ÖĞµÄ·ûºÅº¬ÒåÈçÏÂ£¬w£ºĞÇÆÚ£»c£ºÊÀ¼Í£»y£ºÄê£¨Á½Î»Êı£©£»m£ºÔÂ£¨m´óÓÚµÈÓÚ3£¬Ğ¡
-	ÓÚµÈÓÚ14£¬¼´ÔÚ²ÌÀÕ¹«Ê½ÖĞ£¬Ä³ÄêµÄ1¡¢2ÔÂÒª¿´×÷ÉÏÒ»ÄêµÄ13¡¢14ÔÂÀ´¼ÆËã£¬±ÈÈç2003Äê1ÔÂ1
-	ÈÕÒª¿´×÷2002ÄêµÄ13ÔÂ1ÈÕÀ´¼ÆËã£©£»d£ºÈÕ£»[ ]´ú±íÈ¡Õû£¬¼´Ö»ÒªÕûÊı²¿·Ö¡£
+	ç„¶åwå¯¹7å–ä½™ã€‚
+	å…¬å¼ä¸­çš„ç¬¦å·å«ä¹‰å¦‚ä¸‹ï¼Œwï¼šæ˜ŸæœŸï¼›cï¼šä¸–çºªï¼›yï¼šå¹´ï¼ˆä¸¤ä½æ•°ï¼‰ï¼›mï¼šæœˆï¼ˆmå¤§äºç­‰äº3ï¼Œå°
+	äºç­‰äº14ï¼Œå³åœ¨è”¡å‹’å…¬å¼ä¸­ï¼ŒæŸå¹´çš„1ã€2æœˆè¦çœ‹ä½œä¸Šä¸€å¹´çš„13ã€14æœˆæ¥è®¡ç®—ï¼Œæ¯”å¦‚2003å¹´1æœˆ1
+	æ—¥è¦çœ‹ä½œ2002å¹´çš„13æœˆ1æ—¥æ¥è®¡ç®—ï¼‰ï¼›dï¼šæ—¥ï¼›[ ]ä»£è¡¨å–æ•´ï¼Œå³åªè¦æ•´æ•°éƒ¨åˆ†ã€‚
 
-* Èë¿Ú²ÎÊı£ºYear:Äê; Month:ÔÂ; Date:ÈÕ¡£
-* ³ö¿Ú²ÎÊı£ºĞÇÆÚ¼¸ 1~6´ú±íĞÇÆÚÒ»~ĞÇÆÚÁù£¬0´ú±íĞÇÆÚÌì
-* Ëµ    Ã÷£º
-* µ÷ÓÃ·½·¨£ºÎŞ
+* å…¥å£å‚æ•°ï¼šYear:å¹´; Month:æœˆ; Date:æ—¥ã€‚
+* å‡ºå£å‚æ•°ï¼šæ˜ŸæœŸå‡  1~6ä»£è¡¨æ˜ŸæœŸä¸€~æ˜ŸæœŸå…­ï¼Œ0ä»£è¡¨æ˜ŸæœŸå¤©
+* è¯´    æ˜ï¼š
+* è°ƒç”¨æ–¹æ³•ï¼šæ— 
 ****************************************************************************/
 unsigned char ICACHE_FLASH_ATTR Get_Week(unsigned int Year,unsigned char Month,unsigned char Date)
 {
@@ -468,7 +469,7 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
 	 uint32 hourstart = 0,hourend = 0;
 
 	 current_stamp = sntp_get_current_timestamp();
-	 current_stamp = current_stamp - 28800; /*  ÏÈÈÃÊ±Çø»Øµ½±ê×¼×´Ì¬ */
+	 current_stamp = current_stamp - 28800; /*  å…ˆè®©æ—¶åŒºå›åˆ°æ ‡å‡†çŠ¶æ€ */
 	 RealTime = sntp_get_real_time(current_stamp + SEC_TIME_ZONE);
 
      for(i = 0; i < 32; i ++)
@@ -481,9 +482,9 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
     	 NTP_time[i] = RealTime[i];
      }
 
-    DealwithNtpStr(NTP_time,&Ntp_Data1); /* ¶Ô×Ö·û´®Ê±¼äÊı¾İ×ö´¦Àí£¬´æ´¢µ½½á¹¹ÌåÖĞ */
+    DealwithNtpStr(NTP_time,&Ntp_Data1); /* å¯¹å­—ç¬¦ä¸²æ—¶é—´æ•°æ®åšå¤„ç†ï¼Œå­˜å‚¨åˆ°ç»“æ„ä½“ä¸­ */
 	 if(IsDst == DST_SET)
-	 {            //È¡³öÒªÉèÖÃµÄÏÄÁîÊ±Êı¾İ
+	 {            //å–å‡ºè¦è®¾ç½®çš„å¤ä»¤æ—¶æ•°æ®
 		Spi_FlashRead(DST_Erase,DSTSTART_HOUR_ERASE_OFFSET,&DstStart.Dst_Hour,1);
 		Spi_FlashRead(DST_Erase,DSTSTART_SELE_WEEK_ERASE_OFFSET,&DstStart.Dst_WeekSel,1);
 		Spi_FlashRead(DST_Erase,DSTSTART_WEEK_ERASE_OFFSET,&DstStart.Dst_Week,1);
@@ -497,7 +498,7 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
 		 SetDst(&DstStart,&DstEnd,&Ntp_Data1);
 
 	 }
-	 if(Ntp_Data1.Dst_year < 2019) /* ´ú±íÎ´´ÓNTP·şÎñÆ÷»ñÈ¡µ½ÏàÓ¦µÄÊ±¼ä±¨ÎÄ£¬ÔòÖØĞÂ»ñÈ¡ */
+	 if(Ntp_Data1.Dst_year < 2019) /* ä»£è¡¨æœªä»NTPæœåŠ¡å™¨è·å–åˆ°ç›¸åº”çš„æ—¶é—´æŠ¥æ–‡ï¼Œåˆ™é‡æ–°è·å– */
 	 {
 		 AlreadStartPutTime = 0;
 		 LinkAPstate = 0;
@@ -557,8 +558,8 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
 	 PackSend[13] = (uint8_t)(Ntp_Data1.Dst_sec / 10 + 0x30);
 	 PackSend[14] = (uint8_t)(Ntp_Data1.Dst_sec % 10 + 0x30);
 	 PackSend[15] = (uint8_t)(Ntp_Data1. Dst_week + 0x30);
-	 //os_printf("Ntp_Data1 = %d-%d-%d-%d-%d-%d\n",Ntp_Data1.Dst_year,Ntp_Data1.Dst_month,Ntp_Data1.Dst_day, Ntp_Data1.Dst_hour, Ntp_Data1.Dst_min, Ntp_Data1.Dst_sec);
-	 //os_printf("sntp: %d, %s \n",current_stamp,	NTP_time);
+	 DNS_SERVER_DEBUG("Ntp_Data1 = %d-%d-%d-%d-%d-%d\n",Ntp_Data1.Dst_year,Ntp_Data1.Dst_month,Ntp_Data1.Dst_day, Ntp_Data1.Dst_hour, Ntp_Data1.Dst_min, Ntp_Data1.Dst_sec);
+	 DNS_SERVER_DEBUG("sntp: %d, %s \n",current_stamp,	NTP_time);
 
 }
 extern uint8_t LedChoose;
@@ -593,7 +594,7 @@ void ICACHE_FLASH_ATTR PutSntpTime(void)
 // }
 //
 //}
-//struct espconn Dns_esp_conn;     //½¨Á¢Ò»¸öespconn½á¹¹Ìå
+//struct espconn Dns_esp_conn;     //å»ºç«‹ä¸€ä¸ªespconnç»“æ„ä½“
 //ip_addr_t esp_server_ip;
 void ICACHE_FLASH_ATTR Sntp_Config(char *Ntpsever,uint32 NtpipLen)
 {
@@ -618,23 +619,23 @@ void ICACHE_FLASH_ATTR Sntp_Config(char *Ntpsever,uint32 NtpipLen)
 	}
 	if(isDns == 1)
 	{
-     //os_printf("DNSSet\n");
+     DNS_SERVER_DEBUG("DNSSet\n");
 	 sntp_setservername(0, Ntpsever); // set server 0 by domain name
 	 //espconn_gethostbyname(&Dns_esp_conn,Ntpsever,&esp_server_ip,user_esp_platform_dns_found);
 	}
 	else
 	{
-		// os_printf("NODNSSet\n");
+		 DNS_SERVER_DEBUG("NODNSSet\n");
 		//sntp_setservername(1, "ntp.sjtu.edu.cn"); // set server 1 by domain name
 		//ipaddr_aton("210.72.145.44", addr);
 		//ipaddr_aton("182.16.3.162", addr);
-		//os_printf("NTPIP != DSN\n");
+		DNS_SERVER_DEBUG("NTPIP != DSN\n");
 		ipaddr_aton(Ntpsever, addr);
 		sntp_setserver(2, addr); // set server 2 by IP address
 	}
 	sntp_init();
     os_free(addr);
-    Spi_FlashRead(DST_Erase,ISSET_DST_ERASE_OFFSET,&IsDst,1);  //¶ÁÈ¡ÊÇ·ñĞèÒªÉèÖÃÏÄÁîÊ±
+    Spi_FlashRead(DST_Erase,ISSET_DST_ERASE_OFFSET,&IsDst,1);  //è¯»å–æ˜¯å¦éœ€è¦è®¾ç½®å¤ä»¤æ—¶
 
 	os_timer_disarm(&sntp_timer);
 	os_timer_setfn(&sntp_timer, (os_timer_func_t *)user_check_sntp_stamp, NULL);
@@ -643,21 +644,21 @@ void ICACHE_FLASH_ATTR Sntp_Config(char *Ntpsever,uint32 NtpipLen)
 
 }
 ///*-------------------------------------------------------------*/
-///*º¯Êı¹¦ÄÜ£ºsmartlinkÖÇÄÜ³õÊ¼»¯                                                                  */
-///*²Î       Êı£ºstatus £ºsmartlink×´Ì¬                                                               */
-///*²Î       Êı£ºpdata £º²»Í¬µÄ×´Ì¬´ú±íµÄÊı¾İ²»Í¬                                                */
-///*·µ       »Ø£ºÎŞ                                                                                                     */
+///*å‡½æ•°åŠŸèƒ½ï¼šsmartlinkæ™ºèƒ½åˆå§‹åŒ–                                                                  */
+///*å‚       æ•°ï¼šstatus ï¼šsmartlinkçŠ¶æ€                                                               */
+///*å‚       æ•°ï¼špdata ï¼šä¸åŒçš„çŠ¶æ€ä»£è¡¨çš„æ•°æ®ä¸åŒ                                                */
+///*è¿”       å›ï¼šæ—                                                                                                      */
 ///*-------------------------------------------------------------*/
 //void ICACHE_FLASH_ATTR smartconfig_init(void)
 //{
-//	smartconfig_set_type(SC_TYPE_ESPTOUCH_AIRKISS);     //ÉèÖÃsmartlinkÄ£Ê½£ºESPTOUCH
-//	smartconfig_start(smartconfig_done,0);      //¿ªÊ¼smartlink,²¢ÉèÖÃsmartlink»Øµ÷º¯Êı£¬1£º±íÊ¾´®¿Ú0´òÓ¡smartlinkµÄÁ¬½Ó¹ı³ÌĞÅÏ¢
+//	smartconfig_set_type(SC_TYPE_ESPTOUCH_AIRKISS);     //è®¾ç½®smartlinkæ¨¡å¼ï¼šESPTOUCH
+//	smartconfig_start(smartconfig_done,0);      //å¼€å§‹smartlink,å¹¶è®¾ç½®smartlinkå›è°ƒå‡½æ•°ï¼Œ1ï¼šè¡¨ç¤ºä¸²å£0æ‰“å°smartlinkçš„è¿æ¥è¿‡ç¨‹ä¿¡æ¯
 //}
 ///*-------------------------------------------------------------*/
-///*º¯Êı¹¦ÄÜ£ºsmartlinkÖÇÄÜÁ¬½Óº¯Êı                                                                  */
-///*²Î       Êı£ºstatus £ºsmartlink×´Ì¬                                                               */
-///*²Î       Êı£ºpdata £º²»Í¬µÄ×´Ì¬´ú±íµÄÊı¾İ²»Í¬                                                */
-///*·µ       »Ø£ºÎŞ                                                                                                     */
+///*å‡½æ•°åŠŸèƒ½ï¼šsmartlinkæ™ºèƒ½è¿æ¥å‡½æ•°                                                                  */
+///*å‚       æ•°ï¼šstatus ï¼šsmartlinkçŠ¶æ€                                                               */
+///*å‚       æ•°ï¼špdata ï¼šä¸åŒçš„çŠ¶æ€ä»£è¡¨çš„æ•°æ®ä¸åŒ                                                */
+///*è¿”       å›ï¼šæ—                                                                                                      */
 ///*-------------------------------------------------------------*/
 //void ICACHE_FLASH_ATTR smartconfig_done(sc_status status, void *pdata)
 //{
@@ -668,7 +669,7 @@ void ICACHE_FLASH_ATTR Sntp_Config(char *Ntpsever,uint32 NtpipLen)
 //												break;
 //
 //			case SC_STATUS_FIND_CHANNEL:		os_printf("SC_STATUS_FIND_CHANNEL\n");
-//												//100msµÄÒ»¸ö¶¨Ê±Æ÷(×Ô¶¯Ä£Ê½)£¬ÖÇÄÜÁ¬½Ó¹ı³ÌÔÚ£¬¿ØÖÆledÉÁË¸£¬Æğµ½Ö¸Ê¾×÷ÓÃ
+//												//100msçš„ä¸€ä¸ªå®šæ—¶å™¨(è‡ªåŠ¨æ¨¡å¼)ï¼Œæ™ºèƒ½è¿æ¥è¿‡ç¨‹åœ¨ï¼Œæ§åˆ¶ledé—ªçƒï¼Œèµ·åˆ°æŒ‡ç¤ºä½œç”¨
 //												os_timer_disarm(&smartconfig_timer);
 //												os_timer_setfn(&smartconfig_timer, (os_timer_func_t *)smartconfig_led, NULL);
 //												os_timer_arm(&smartconfig_timer, 100, 1);
@@ -701,7 +702,7 @@ void ICACHE_FLASH_ATTR Sntp_Config(char *Ntpsever,uint32 NtpipLen)
 //													memcpy(phone_ip, (uint8*)pdata, 4);
 //													os_printf("Phone ip: %d.%d.%d.%d\n",phone_ip[0],phone_ip[1],phone_ip[2],phone_ip[3]);
 //												}
-//												os_printf("ÒÑ¼ÇÂ¼ĞÅÏ¢\r\n");
+//												os_printf("å·²è®°å½•ä¿¡æ¯\r\n");
 //												smartconfig_stop();
 //												os_timer_disarm(&smartconfig_timer);
 //
@@ -718,14 +719,14 @@ void Spi_FlashRead(uint32 Erase_Point,uint32 Erase_Offset,uint32 * data_point,ui
 	spi_flash_read(Erase_Point * 4096 + Erase_Offset, (uint32 *) data_point, data_len * 4);
 }
 /*-------------------------------------------------------------*/
-/*º¯Êı¹¦ÄÜ£º¿ØÖÆledÉÁË¸£¬Æğµ½Ö¸Ê¾×÷ÓÃ                                                              */
-/*²Î       Êı£ºÎŞ                                                                                                     */
-/*·µ       »Ø£ºÎŞ                                                                                                     */
+/*å‡½æ•°åŠŸèƒ½ï¼šæ§åˆ¶ledé—ªçƒï¼Œèµ·åˆ°æŒ‡ç¤ºä½œç”¨                                                              */
+/*å‚       æ•°ï¼šæ—                                                                                                      */
+/*è¿”       å›ï¼šæ—                                                                                                      */
 /*-------------------------------------------------------------*/
 //void ICACHE_FLASH_ATTR smartconfig_led(void)
 //{
-//	if(GPIO_REG_READ(GPIO_OUT_ADDRESS)&0x4000) //¶ÁÈ¡GPIO14µÄ×´Ì¬,Èç¹ûif³ÉÁ¢,±íÊ¾GPIO14ÊÇ¸ßµçÆ½£¬LED3ÊÇÏ¨ÃğµÄ×´Ì¬
-//		rgbSensorTest(0);                               //µãÁÁ
-//	else                                       //·´Ö®,±íÊ¾GPIO14ÊÇµÍµçÆ½£¬LED3ÊÇµãÁÁµÄ×´Ì¬
-//		rgbSensorTest(1);                              //Ï¨Ãğ
+//	if(GPIO_REG_READ(GPIO_OUT_ADDRESS)&0x4000) //è¯»å–GPIO14çš„çŠ¶æ€,å¦‚æœifæˆç«‹,è¡¨ç¤ºGPIO14æ˜¯é«˜ç”µå¹³ï¼ŒLED3æ˜¯ç†„ç­çš„çŠ¶æ€
+//		rgbSensorTest(0);                               //ç‚¹äº®
+//	else                                       //åä¹‹,è¡¨ç¤ºGPIO14æ˜¯ä½ç”µå¹³ï¼ŒLED3æ˜¯ç‚¹äº®çš„çŠ¶æ€
+//		rgbSensorTest(1);                              //ç†„ç­
 //}

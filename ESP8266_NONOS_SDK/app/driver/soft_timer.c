@@ -1,18 +1,20 @@
 /*
  * soft_timer.c
  *
- *  Created on: 2019Äê7ÔÂ28ÈÕ
+ *  Created on: 2019å¹´7æœˆ28æ—¥
  *      Author: Administrator
  */
+#include "init.h"
 #include "udpclient.h"
 #include "soft_timer.h"
 #include "tcpserver.h"
 #include "Rgbled.h"
 #include "mySmartlink.h"
 #include "tcpclient.h"
+
 extern uint8_t LedChoose ;
 extern int32 Ntp_Timezone;
-os_timer_t Init_timer,Check_SmartConfig,test_timer,sntpPutTime,LedCloseTime,TcpClientLink;  //¶¨ÒåÒ»¸ö¶¨Ê±Æ÷½á¹¹
+os_timer_t Init_timer,Check_SmartConfig,test_timer,sntpPutTime,LedCloseTime,TcpClientLink;  //å®šä¹‰ä¸€ä¸ªå®šæ—¶å™¨ç»“æ„
 int32 Init_Setup = INIT_NO_SET;
 extern uint32 If_Init_Set;
 uint32_t timerForLinkAP;
@@ -34,17 +36,17 @@ void ICACHE_FLASH_ATTR SetNtp()
 	  	Ntpsever1[i] = 0;
 	  }
 
-	 Spi_FlashRead(NTP_IP_Erase,NTP_IP_LEN_ERASE_OFFSET,&NtpIpLen,1);  //¶ÁÈ¡NTP IPµÄ³¤¶È
+	 Spi_FlashRead(NTP_IP_Erase,NTP_IP_LEN_ERASE_OFFSET,&NtpIpLen,1);  //è¯»å–NTP IPçš„é•¿åº¦
 	 if((NtpIpLen <= 0) && (NtpIpLen >= 32))
 	 {
-		//os_printf("NtpIpLen= %d\n",NtpIpLen);
+		DNS_SERVER_DEBUG("NtpIpLen= %d\n",NtpIpLen);
 	 	return ;
 	 }
 	 else
 	 {
-		 //os_printf("NtpIpLen= %d\n",NtpIpLen);
-		 Spi_FlashRead(NTP_IP_Erase,NTP_IP_ERASE_OFFSET,Ntpsever,NtpIpLen);  //¶ÁÈ¡NTP IP
-		 Spi_FlashRead(TIMEZONE_ERASE,TIMEZONE_ERASE_OFFSET,&Ntp_Timezone,1);   //¶ÁÈ¡Ê±Çø
+		 DNS_SERVER_DEBUG("NtpIpLen= %d\n",NtpIpLen);
+		 Spi_FlashRead(NTP_IP_Erase,NTP_IP_ERASE_OFFSET,Ntpsever,NtpIpLen);  //è¯»å–NTP IP
+		 Spi_FlashRead(TIMEZONE_ERASE,TIMEZONE_ERASE_OFFSET,&Ntp_Timezone,1);   //è¯»å–æ—¶åŒº
 		 for(i = 0; i < NtpIpLen; i ++)
 		 {
 		   Ntpsever1[i] = (char)Ntpsever[i];
@@ -53,7 +55,7 @@ void ICACHE_FLASH_ATTR SetNtp()
 		 sntp_stop();
 		 Sntp_Config(Ntpsever1,NtpIpLen);
 
-		 //os_printf("sntp_get_timezone = %d\n", sntp_get_timezone());
+		 DNS_SERVER_DEBUG("sntp_get_timezone = %d\n", sntp_get_timezone());
 	 }
 
 }
@@ -68,25 +70,23 @@ void ICACHE_FLASH_ATTR Check_Smart_Link(void)
     static uint8 LedState;
     uint32 i,APid = 0;
     struct softap_config config1;
-//    uint8 stationCount = wifi_softap_get_station_num();
-//    os_printf("stationCount = %d\n", stationCount);
     SysTime_ms = SysTime_ms + 100;
 	if(SysTime_ms >= 500)
 	{
-		wifi_softap_get_config(&config1);       //»ñÈ¡²ÎÊı
+		wifi_softap_get_config(&config1);       //è·å–å‚æ•°
 		if(FirstSetInf == 1)
 		{
 		    Spi_FlashRead(FIRST_START_Erase,FIRST_START_ERASE_OFFSET,&SetDevideCount,1);
 		    if(SetDevideCount > 1)
 		    {
-				if(config1.channel != LastChannel ) /* Èç¹ûĞŞ¸ÄÊı¾İºó ·¢ÏÖÁ¬½ÓµÄÍøÂçĞÅµÀºÍÉÏÒ»´ÎµÄ²»Ò»Ñù ÎªÁË±ÜÃâÆ»¹ûÉè±¸Á¬½Ó²»ÉÏ£¬ÔòÖØÆô*/
+				if(config1.channel != LastChannel ) /* å¦‚æœä¿®æ”¹æ•°æ®å å‘ç°è¿æ¥çš„ç½‘ç»œä¿¡é“å’Œä¸Šä¸€æ¬¡çš„ä¸ä¸€æ · ä¸ºäº†é¿å…è‹¹æœè®¾å¤‡è¿æ¥ä¸ä¸Šï¼Œåˆ™é‡å¯*/
 				{
 					system_restart();
 				}
 		    }
 		}
 	    LastChannel = config1.channel;
-		wifi_get_ip_info(STATION_IF, &dynamic_ipconfig);  //»ñÈ¡¶¯Ì¬IP
+		wifi_get_ip_info(STATION_IF, &dynamic_ipconfig);  //è·å–åŠ¨æ€IP
 		ApLink = wifi_station_get_connect_status();
 	    text = wifi_softap_get_station_num();
 		SysTime_ms = 0;
@@ -94,7 +94,7 @@ void ICACHE_FLASH_ATTR Check_Smart_Link(void)
 		{
 			if(AlreadStartPutTime == 0)
 			{
-				switch(LedState)   /*ÈôÃ»ÓĞ»ñÈ¡µ½NTP·şÎñÆ÷µÄÊı¾İ£¬ÔòÉÁË¸µÆ */
+				switch(LedState)   /*è‹¥æ²¡æœ‰è·å–åˆ°NTPæœåŠ¡å™¨çš„æ•°æ®ï¼Œåˆ™é—ªçƒç¯ */
 				{
 					case 0:
 							LedRed(0);
@@ -117,13 +117,13 @@ void ICACHE_FLASH_ATTR Check_Smart_Link(void)
 				LedOpenChoose(LedChoose);
 			}
 
-			//os_printf("blue\n");
+			//DNS_SERVER_DEBUG("blue\n");
 		}
 		else if((text == 0) && ApLink == 5)
 		{
 			if(AlreadStartPutTime == 0)
 			{
-				switch(LedState)   /*ÈôÃ»ÓĞ»ñÈ¡µ½NTP·şÎñÆ÷µÄÊı¾İ£¬ÔòÉÁË¸µÆ */
+				switch(LedState)   /*è‹¥æ²¡æœ‰è·å–åˆ°NTPæœåŠ¡å™¨çš„æ•°æ®ï¼Œåˆ™é—ªçƒç¯ */
 				{
 					case 0:
 							LedBlue(0);
@@ -145,12 +145,12 @@ void ICACHE_FLASH_ATTR Check_Smart_Link(void)
 				LedChoose = GREENLED;
 				LedOpenChoose(LedChoose);
 			}
-			//os_printf("GREENLED\n");
+			//DNS_SERVER_DEBUG("GREENLED\n");
 		}
 		else if((text == 0) && ApLink != 5)
 		{
 			Time_ms = Time_ms + 500;
-			//os_printf("REDLED\n");
+			//DNS_SERVER_DEBUG("REDLED\n");
 			if(Time_ms >= 1000)
 			{
 				Time_ms = 0;
@@ -177,13 +177,13 @@ void ICACHE_FLASH_ATTR Check_Smart_Link(void)
 
 	switch(LinkAPstate)
 	{
-	 case 0:if(ApLink != 5)   //Ã»ÓĞ·ÖÅäµ½IPµØÖ·£¬ËµÃ÷Ã»ÓĞÁ¬½ÓÉÏWIFI£¬ÖØĞÂ¼ì²â
+	 case 0:if(ApLink != 5)   //æ²¡æœ‰åˆ†é…åˆ°IPåœ°å€ï¼Œè¯´æ˜æ²¡æœ‰è¿æ¥ä¸ŠWIFIï¼Œé‡æ–°æ£€æµ‹
 			{
 		       timerForLinkAP = timerForLinkAP + 500;
-				if(timerForLinkAP >= 8000) //Èç¹û8Ãë»¹Î´Á¬½Óµ½WIFI£¬ÔòÇĞ»»AP ID£¬¼ÌĞøÁ¬½Ó
+				if(timerForLinkAP >= 8000) //å¦‚æœ8ç§’è¿˜æœªè¿æ¥åˆ°WIFIï¼Œåˆ™åˆ‡æ¢AP IDï¼Œç»§ç»­è¿æ¥
 				{
 					timerForLinkAP = 0;
-					Spi_FlashRead(AP_NUM_Erase,AP_NUM_ERASE_OFFSET,&APid,1);  //´ÓFLASHÖĞ»ñÈ¡AP_ID
+					Spi_FlashRead(AP_NUM_Erase,AP_NUM_ERASE_OFFSET,&APid,1);  //ä»FLASHä¸­è·å–AP_ID
 //					switch(APid)
 //					{
 //						case APID1:  //os_printf("APid = APID2;\n");
@@ -199,7 +199,7 @@ void ICACHE_FLASH_ATTR Check_Smart_Link(void)
 //					{
 					      vLink_AP(APid);
 ////					  spi_flash_erase_sector (AP_NUM_Erase);
-////					  spi_flash_write(AP_NUM_Erase*4*1024 + AP_NUM_ERASE_OFFSET,&APid,1 * 4);   //¼ÇÂ¼¿Í»§ÅäÖÃµÄAPid
+////					  spi_flash_write(AP_NUM_Erase*4*1024 + AP_NUM_ERASE_OFFSET,&APid,1 * 4);   //è®°å½•å®¢æˆ·é…ç½®çš„APid
 //					}
 				}
 
@@ -207,19 +207,19 @@ void ICACHE_FLASH_ATTR Check_Smart_Link(void)
 			   else
 			{
 				timerForLinkAP = 0;
-				//os_printf("yilianjie\n");
+				DNS_SERVER_DEBUG("yilianjie\n");
 				SetNtp();
 				LinkAPstate = 1;
 			}
 	                       break;
-	 case 1:if(ApLink != 5)   //Ã»ÓĞ·ÖÅäµ½IPµØÖ·£¬ËµÃ÷Ã»ÓĞÁ¬½ÓÉÏWIFI£¬ÖØĞÂ¼ì²â
+	 case 1:if(ApLink != 5)   //æ²¡æœ‰åˆ†é…åˆ°IPåœ°å€ï¼Œè¯´æ˜æ²¡æœ‰è¿æ¥ä¸ŠWIFIï¼Œé‡æ–°æ£€æµ‹
 			{
 
-	            LinkAPstate = 0;   //Èô¶Ï¿ªÁËÁ¬½Ó £¬Ôò»Øµ½µÚÒ»²½
+	            LinkAPstate = 0;   //è‹¥æ–­å¼€äº†è¿æ¥ ï¼Œåˆ™å›åˆ°ç¬¬ä¸€æ­¥
 			}
 			 else
 			 {
-              // os_printf("baochilianjie\n");
+              // DNS_SERVER_DEBUG("baochilianjie\n");
 			 }
 	                       break;
 	 default:LinkAPstate = 1;break;
@@ -229,36 +229,36 @@ void ICACHE_FLASH_ATTR Check_Smart_Link(void)
 
 }
 /*-------------------------------------------------------------*/
-/*º¯Êı¹¦ÄÜ£º²éÑ¯IP»ñÈ¡½á¹ûµÄ»Øµ÷º¯Êı                                                               */
-/*²Î       Êı£ºÎŞ                                                                                                     */
-/*·µ       »Ø£ºÎŞ                                                                                                     */
+/*å‡½æ•°åŠŸèƒ½ï¼šæŸ¥è¯¢IPè·å–ç»“æœçš„å›è°ƒå‡½æ•°                                                               */
+/*å‚       æ•°ï¼šæ—                                                                                                      */
+/*è¿”       å›ï¼šæ—                                                                                                      */
 /*-------------------------------------------------------------*/
 
 void ICACHE_FLASH_ATTR user_check_ip(void)
 {
     struct ip_info Static_ipconfig,dynamic_ipconfig;
 
-    wifi_get_ip_info(SOFTAP_IF, &Static_ipconfig);    //»ñÈ¡APÄ£Ê½ÏÂ IPĞÅÏ¢£¬±£´æµ½ipconfig
-	wifi_get_ip_info(STATION_IF, &dynamic_ipconfig);  //»ñÈ¡¶¯Ì¬IP
+    wifi_get_ip_info(SOFTAP_IF, &Static_ipconfig);    //è·å–APæ¨¡å¼ä¸‹ IPä¿¡æ¯ï¼Œä¿å­˜åˆ°ipconfig
+	wifi_get_ip_info(STATION_IF, &dynamic_ipconfig);  //è·å–åŠ¨æ€IP
 
-    if (Static_ipconfig.ip.addr != 0)                 //µ÷ÓÃ²éÑ¯ ×´Ì¬º¯Êı£¬ipconfig½á¹¹ÌåÖĞipÖµ·Ç0£¬Ôòif³ÉÁ¢
+    if (Static_ipconfig.ip.addr != 0)                 //è°ƒç”¨æŸ¥è¯¢ çŠ¶æ€å‡½æ•°ï¼Œipconfigç»“æ„ä½“ä¸­ipå€¼é0ï¼Œåˆ™ifæˆç«‹
     {
-    	//os_printf("IP = %d\n",Static_ipconfig.ip.addr);
+    	DNS_SERVER_DEBUG("IP = %d\n",Static_ipconfig.ip.addr);
         uint32 APP_TCPPort = 0;
-    	ipv4_to_str(SOFTAP_IF,Static_ipconfig.ip.addr);  //´òÓ¡¾²Ì¬IP
-    	ipv4_to_str(STATION_IF,dynamic_ipconfig.ip.addr); //´òÓ¡¶¯Ì¬IP
+    	ipv4_to_str(SOFTAP_IF,Static_ipconfig.ip.addr);  //æ‰“å°é™æ€IP
+    	ipv4_to_str(STATION_IF,dynamic_ipconfig.ip.addr); //æ‰“å°åŠ¨æ€IP
         user_dns_server_init();
-		//os_printf("Get IP successful\r\n");    //ÌáÊ¾»ñÈ¡IP³É¹¦
+		DNS_SERVER_DEBUG("Get IP successful\r\n");    //æç¤ºè·å–IPæˆåŠŸ
         espconn_tcp_set_max_con(8);
-       // AP_tcpclient_init();                   /* ¿Í»§¶Ë³õÊ¼»¯ */
-		AP_tcpserver_init(SERVER_PORT);          //·şÎñÆ÷³õÊ¼»¯
+       // AP_tcpclient_init();                   /* å®¢æˆ·ç«¯åˆå§‹åŒ– */
+		AP_tcpserver_init(SERVER_PORT);          //æœåŠ¡å™¨åˆå§‹åŒ–
 		Spi_FlashRead(TCP_PORT_Erase,TCP_PORT_ERASE_OFFSET,&APP_TCPPort,1);
 		if(APP_TCPPort <= 0 || APP_TCPPort > 65535)
 		{
 	       APP_TCPPort = 50000;
 		}
 		AP_tcpserverAPP_init(APP_TCPPort);
-		//AP_udpclient_init();                   /* UDP·şÎñÆ÷³õÊ¼»¯ */
+		//AP_udpclient_init();                   /* UDPæœåŠ¡å™¨åˆå§‹åŒ– */
 
     }
     else
@@ -274,35 +274,35 @@ void ICACHE_FLASH_ATTR Init_Set_up(void)
     static uint32 Restart_Timer;;
     //static uint32_t timer1,Mode;
 	Init_Setup_timer = Init_Setup_timer + 100;
-	if(FirstIn == 0)  /* µÚÒ»´Î½øÀ´ ÔòÉ¨ÃèÒ»´ÎAP£¬¶øºó¶¨Ê±É¨Ãè*/
+	if(FirstIn == 0)  /* ç¬¬ä¸€æ¬¡è¿›æ¥ åˆ™æ‰«æä¸€æ¬¡APï¼Œè€Œåå®šæ—¶æ‰«æ*/
 	{
 	  FirstIn = 1;
-	  user_scan();  /* É¨ÃèAPĞÅÏ¢ */
+	  user_scan();  /* æ‰«æAPä¿¡æ¯ */
 	}
 
-	if(wifi_softap_get_station_num() >= 1) /*ÈôÓĞÉè±¸Á¬½Ó£¬Ôò8S¼ì²âÒ»´ÎAPĞÅÏ¢ */
+	if(wifi_softap_get_station_num() >= 1) /*è‹¥æœ‰è®¾å¤‡è¿æ¥ï¼Œåˆ™8Sæ£€æµ‹ä¸€æ¬¡APä¿¡æ¯ */
 	{
 		if(Init_Setup_timer >= 8000)
 		{
-		    //os_printf("system_get_free_heap_size() = %d\n",system_get_free_heap_size());
+		    DNS_SERVER_DEBUG("system_get_free_heap_size() = %d\n",system_get_free_heap_size());
 			Init_Setup_timer = 0;
 			user_scan();
 		}
 	}
-	else     /*ÈôÎŞÉè±¸Á¬½Ó£¬Ôò20S¼ì²âÒ»´ÎAPĞÅÏ¢ */
+	else     /*è‹¥æ— è®¾å¤‡è¿æ¥ï¼Œåˆ™20Sæ£€æµ‹ä¸€æ¬¡APä¿¡æ¯ */
 	{
 		if(Init_Setup_timer >= 20000)
 		{
 			Init_Setup_timer = 0;
 			user_scan();
-			if(system_get_free_heap_size() <= 500) /* Èô¿ÉÓÃÄÚ´æĞ¡ÓÚ500×Ö½Ú ÔòÖØÆô */
+			if(system_get_free_heap_size() <= 500) /* è‹¥å¯ç”¨å†…å­˜å°äº500å­—èŠ‚ åˆ™é‡å¯ */
 			{
-				system_restart();      //ÖØÆô
+				system_restart();      //é‡å¯
 			}
 		}
 	}
 
-	if(GPIO_INPUT_GET(GPIO_ID_PIN(12)) == 0x00)  //°´¼ü°´ÏÂ³¬¹ı0.5Ãë£¬Ôò»Ö¸´³ö³§ÉèÖÃ
+	if(GPIO_INPUT_GET(GPIO_ID_PIN(12)) == 0x00)  //æŒ‰é”®æŒ‰ä¸‹è¶…è¿‡0.5ç§’ï¼Œåˆ™æ¢å¤å‡ºå‚è®¾ç½®
     {
 		Restart_Timer = Restart_Timer + 100;
     	if(Restart_Timer >= 500)
@@ -311,7 +311,7 @@ void ICACHE_FLASH_ATTR Init_Set_up(void)
 			 Spi_FlashWrite(Init_Erase, 0,&Init_Setup, 1);
 			 os_printf("Restart\n");
 			 system_restore();
-			 system_restart();      //ÖØÆô
+			 system_restart();      //é‡å¯
     	}
 
     }
@@ -325,24 +325,24 @@ void ICACHE_FLASH_ATTR IsTcpClientLink(void)
 {
     struct ip_info dynamic_ipconfig;
 
-	wifi_get_ip_info(STATION_IF, &dynamic_ipconfig);  //»ñÈ¡¶¯Ì¬IP
+	wifi_get_ip_info(STATION_IF, &dynamic_ipconfig);  //è·å–åŠ¨æ€IP
 
-    if (dynamic_ipconfig.ip.addr != 0)                 //µ÷ÓÃ²éÑ¯ ×´Ì¬º¯Êı£¬ipconfig½á¹¹ÌåÖĞipÖµ·Ç0£¬Ôòif³ÉÁ¢
+    if (dynamic_ipconfig.ip.addr != 0)                 //è°ƒç”¨æŸ¥è¯¢ çŠ¶æ€å‡½æ•°ï¼Œipconfigç»“æ„ä½“ä¸­ipå€¼é0ï¼Œåˆ™ifæˆç«‹
     {
 		int32_t TcpPort = 0,TcpServerLen = 0;
     	Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVER_PORT_ERASE_OFFSET, &TcpPort,1);
     	Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVERIPLen_ERASE_OFFSET, &TcpServerLen,1);
-        if(TcpServerLen == 4)  /*ËµÃ÷ÊÇIPµØÖ·  Ö±½ÓÁ¬½Ó¼´¿É */
+        if(TcpServerLen == 4)  /*è¯´æ˜æ˜¯IPåœ°å€  ç›´æ¥è¿æ¥å³å¯ */
         {
            AP_tcpclient_init(TcpClientToServer,TcpPort);
 
         }
-        else if(TcpServerLen >= 7) /*ÈôÊÇDNS£¬ÔòĞèÒª½â¿ªÓòÃûµÄIP ÔÙÁ¬½ÓTCP·şÎñÆ÷ */
+        else if(TcpServerLen >= 7) /*è‹¥æ˜¯DNSï¼Œåˆ™éœ€è¦è§£å¼€åŸŸåçš„IP å†è¿æ¥TCPæœåŠ¡å™¨ */
         {
     	   espconn_gethostbyname(&Dns_Client_conn,DnsBuffer,&esp_server_ip,user_esp_platform_dns_found);
         }
-    	   os_timer_disarm(&TcpClientLink); /* È¡Ïû¶¨Ê±Æ÷ */
-    	   //os_printf("quxiaodingshiqi\n");
+    	   os_timer_disarm(&TcpClientLink); /* å–æ¶ˆå®šæ—¶å™¨ */
+    	   //DNS_SERVER_DEBUG("quxiaodingshiqi\n");
 
     }
     else

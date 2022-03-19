@@ -1,7 +1,7 @@
 /*
  * uart0.c
  *
- *  Created on: 2017Äê1ÔÂ24ÈÕ
+ *  Created on: 2017å¹´1æœˆ24æ—¥
  *      Author: dell
  */
 
@@ -17,34 +17,35 @@
 #include "espconn.h"
 #include "tcpserver.h"
 #include "tcpclient.h"
-uint8 UART0_RX_BUFF[256];        //´®¿Ú0½ÓÊÕÊý¾ÝÊý×é
-uint8  data_len;         //FIFOÄÚÊý¾ÝÁ¿
-extern struct espconn esp_conn_App;   //½¨Á¢Ò»¸öespconn½á¹¹Ìå
+#include "init.h"
+uint8 UART0_RX_BUFF[256];        //ä¸²å£0æŽ¥æ”¶æ•°æ®æ•°ç»„
+uint8  data_len;         //FIFOå†…æ•°æ®é‡
+extern struct espconn esp_conn_App;   //å»ºç«‹ä¸€ä¸ªespconnç»“æž„ä½“
 /*-------------------------------------------------------------*/
-/*º¯Êý¹¦ÄÜ£º´®¿Ú0½ÓÊÕÖÐ¶Ïº¯Êý                                                                           */
-/*²Î       Êý£ºpara £ºÖ¸ÏòRcvMsgBuffµÄÖ¸Õë                                                      */
-/*·µ       »Ø£ºÎÞ                                                                                                     */
+/*å‡½æ•°åŠŸèƒ½ï¼šä¸²å£0æŽ¥æ”¶ä¸­æ–­å‡½æ•°                                                                           */
+/*å‚       æ•°ï¼špara ï¼šæŒ‡å‘RcvMsgBuffçš„æŒ‡é’ˆ                                                      */
+/*è¿”       å›žï¼šæ—                                                                                                      */
 /*-------------------------------------------------------------*/
 extern uint32 NtpappMode;
 LOCAL void uart0_rx_intr_handler(void *para)
 {
-    u32 uart0_intr_sta;   //±£´æÖÐ¶Ï×´Ì¬
+    u32 uart0_intr_sta;   //ä¿å­˜ä¸­æ–­çŠ¶æ€
 
     u8  i;
     uint32 TcpType;
-    uart0_intr_sta=READ_PERI_REG(UART_INT_ST(UART0));    //¶ÁÈ¡´®¿Ú0ÖÐ¶Ï×´Ì¬
+    uart0_intr_sta=READ_PERI_REG(UART_INT_ST(UART0));    //è¯»å–ä¸²å£0ä¸­æ–­çŠ¶æ€
 
-	if(UART_RXFIFO_TOUT_INT_ST==(uart0_intr_sta&UART_RXFIFO_TOUT_INT_ST))    //Èç¹ûÊÇ´®¿Ú½ÓÊÕ³¬Ê±ÖÐ¶Ï
+	if(UART_RXFIFO_TOUT_INT_ST==(uart0_intr_sta&UART_RXFIFO_TOUT_INT_ST))    //å¦‚æžœæ˜¯ä¸²å£æŽ¥æ”¶è¶…æ—¶ä¸­æ–­
 	{
-		data_len=(READ_PERI_REG(UART_STATUS(UART0))>>UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT; //»ñÈ¡FIFOÄÚÊý¾ÝÁ¿
+		data_len=(READ_PERI_REG(UART_STATUS(UART0))>>UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT; //èŽ·å–FIFOå†…æ•°æ®é‡
 		if(data_len > 256)
 		{
-			WRITE_PERI_REG(UART_INT_CLR(UART0), 0xffff);         //Çå³ýÈ«²¿ÖÐ¶Ï±êÖ¾
+			WRITE_PERI_REG(UART_INT_CLR(UART0), 0xffff);         //æ¸…é™¤å…¨éƒ¨ä¸­æ–­æ ‡å¿—
 			return;
 		}
 		for(i=0;i<data_len;i++)
 		{
-		   UART0_RX_BUFF[i]=READ_PERI_REG(UART_FIFO(UART0))&0xFF; //¿½±´Êý¾Ýµ½UART0_RX_BUFFÊý×é
+		   UART0_RX_BUFF[i]=READ_PERI_REG(UART_FIFO(UART0))&0xFF; //æ‹·è´æ•°æ®åˆ°UART0_RX_BUFFæ•°ç»„
 		}
 		     UART0_RX_BUFF[data_len] = '\0';
 
@@ -52,44 +53,44 @@ LOCAL void uart0_rx_intr_handler(void *para)
 			  {
 				 Init_Setup = INIT_SET;
 				 Spi_FlashWrite(Init_Erase, 0,&Init_Setup, 1);
-				 os_printf("Restart\n");
+				 DNS_SERVER_DEBUG("Restart\n");
 				 system_restore();
-				 system_restart();      //ÖØÆô
+				 system_restart();      //é‡å¯
 			  }
-			 SendTcpClientData(UART0_RX_BUFF,data_len);/* Í¨¹ýTCP·¢ËÍÊý¾Ý */
+			 SendTcpClientData(UART0_RX_BUFF,data_len);/* é€šè¿‡TCPå‘é€æ•°æ® */
 
-		//os_printf("data_len = %d\n%s\r\n",data_len,UART0_RX_BUFF);//ÊÕµ½µÄÊý¾ÝÔ­Ñù·¢»Ø
-		//os_memset(UART0_RX_BUFF,0,256);   //·¢ËÍÍêÊý¾Ýºó£¬Çå¿ÕUART0_RX_BUFF
+		//DNS_SERVER_DEBUG("data_len = %d\n%s\r\n",data_len,UART0_RX_BUFF);//æ”¶åˆ°çš„æ•°æ®åŽŸæ ·å‘å›ž
+		//os_memset(UART0_RX_BUFF,0,256);   //å‘é€å®Œæ•°æ®åŽï¼Œæ¸…ç©ºUART0_RX_BUFF
 	}
 
-	WRITE_PERI_REG(UART_INT_CLR(UART0), 0xffff);         //Çå³ýÈ«²¿ÖÐ¶Ï±êÖ¾
+	WRITE_PERI_REG(UART_INT_CLR(UART0), 0xffff);         //æ¸…é™¤å…¨éƒ¨ä¸­æ–­æ ‡å¿—
 }
 
 /*-------------------------------------------------------------*/
-/*º¯Êý¹¦ÄÜ£º´®¿Ú0³õÊ¼»¯                                                                                     */
-/*²Î       Êý£ºUcb£º´®¿Ú¿ØÖÆ¿é                                                                              */
-/*·µ       »Ø£ºÎÞ                                                                                                     */
+/*å‡½æ•°åŠŸèƒ½ï¼šä¸²å£0åˆå§‹åŒ–                                                                                     */
+/*å‚       æ•°ï¼šUcbï¼šä¸²å£æŽ§åˆ¶å—                                                                              */
+/*è¿”       å›žï¼šæ—                                                                                                      */
 /*-------------------------------------------------------------*/
 void ICACHE_FLASH_ATTR uart0_init(UartControlblock *Ucb)
 {
-	ETS_UART_INTR_ATTACH(uart0_rx_intr_handler, NULL);         //ÉèÖÃ´®¿ÚÖÐ¶Ïº¯Êý
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_U0TXD);       //ÉèÖÃ¹¦ÄÜÊÇ´®¿Ú0TX
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_U0RXD);       //ÉèÖÃ¹¦ÄÜÊÇ´®¿Ú0RX
+	ETS_UART_INTR_ATTACH(uart0_rx_intr_handler, NULL);         //è®¾ç½®ä¸²å£ä¸­æ–­å‡½æ•°
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_U0TXD);       //è®¾ç½®åŠŸèƒ½æ˜¯ä¸²å£0TX
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_U0RXD);       //è®¾ç½®åŠŸèƒ½æ˜¯ä¸²å£0RX
 
-	uart_div_modify(UART0, UART_CLK_FREQ / (Ucb->baut_rate));  //ÉèÖÃ²¨ÌØÂÊ
-	SET_PERI_REG_MASK(UART_CONF0(UART0), ((Ucb->en_parity & UART_PARITY_EN_M)  <<  UART_PARITY_EN_S));   //ÉèÖÃÐ£ÑéÊ¹ÄÜÓë·ñ
-	SET_PERI_REG_MASK(UART_CONF0(UART0), ((Ucb->parity & UART_PARITY_M)  << UART_PARITY_S));             //ÉèÖÃÐ£Ñé·½Ê½
-	SET_PERI_REG_MASK(UART_CONF0(UART0), ((Ucb->stop_bits & UART_STOP_BIT_NUM) << UART_STOP_BIT_NUM_S)); //ÉèÖÃÍ£Ö¹Î»¸öÊý
-	SET_PERI_REG_MASK(UART_CONF0(UART0), ((Ucb->data_bits & UART_BIT_NUM) << UART_BIT_NUM_S));           //ÉèÖÃÊý¾ÝÎ»¸öÊý
+	uart_div_modify(UART0, UART_CLK_FREQ / (Ucb->baut_rate));  //è®¾ç½®æ³¢ç‰¹çŽ‡
+	SET_PERI_REG_MASK(UART_CONF0(UART0), ((Ucb->en_parity & UART_PARITY_EN_M)  <<  UART_PARITY_EN_S));   //è®¾ç½®æ ¡éªŒä½¿èƒ½ä¸Žå¦
+	SET_PERI_REG_MASK(UART_CONF0(UART0), ((Ucb->parity & UART_PARITY_M)  << UART_PARITY_S));             //è®¾ç½®æ ¡éªŒæ–¹å¼
+	SET_PERI_REG_MASK(UART_CONF0(UART0), ((Ucb->stop_bits & UART_STOP_BIT_NUM) << UART_STOP_BIT_NUM_S)); //è®¾ç½®åœæ­¢ä½ä¸ªæ•°
+	SET_PERI_REG_MASK(UART_CONF0(UART0), ((Ucb->data_bits & UART_BIT_NUM) << UART_BIT_NUM_S));           //è®¾ç½®æ•°æ®ä½ä¸ªæ•°
 
-	SET_PERI_REG_MASK(UART_CONF0(UART0), UART_RXFIFO_RST | UART_TXFIFO_RST);    //¸´Î»ÊÕ·¢FIFO
-	CLEAR_PERI_REG_MASK(UART_CONF0(UART0), UART_RXFIFO_RST | UART_TXFIFO_RST);  //Í£Ö¹¸´Î»ÊÕ·¢FIFO
+	SET_PERI_REG_MASK(UART_CONF0(UART0), UART_RXFIFO_RST | UART_TXFIFO_RST);    //å¤ä½æ”¶å‘FIFO
+	CLEAR_PERI_REG_MASK(UART_CONF0(UART0), UART_RXFIFO_RST | UART_TXFIFO_RST);  //åœæ­¢å¤ä½æ”¶å‘FIFO
 
-	SET_PERI_REG_MASK(UART_CONF1(UART0),((0x02 & UART_RX_TOUT_THRHD) << UART_RX_TOUT_THRHD_S)); //ÉèÖÃFIFO½ÓÊÕ³¬Ê±ÖÐ¶ÏãÐÖµ2£¬  µ¥Î»ÊÇ½ÓÊÕ1¸ö×Ö½ÚµÄÊ±¼ä
-	SET_PERI_REG_MASK(UART_CONF1(UART0),UART_RX_TOUT_EN);             //Ê¹ÄÜÉÏÊö£¬³¬Ê±ÖÐ¶Ï¹¦ÄÜ
-	SET_PERI_REG_MASK(UART_INT_ENA(UART0), UART_RXFIFO_TOUT_INT_ENA); //Ê¹ÄÜ³¬Ê±½ÓÊÕÖÐ¶Ï
-	WRITE_PERI_REG(UART_INT_CLR(UART0), 0xffff);                      //Çå³ýÈ«²¿ÖÐ¶Ï±êÖ¾
-	ETS_UART_INTR_ENABLE();                                           //¿ª´®¿Ú×ÜÖÐ¶Ï
+	SET_PERI_REG_MASK(UART_CONF1(UART0),((0x02 & UART_RX_TOUT_THRHD) << UART_RX_TOUT_THRHD_S)); //è®¾ç½®FIFOæŽ¥æ”¶è¶…æ—¶ä¸­æ–­é˜ˆå€¼2ï¼Œ  å•ä½æ˜¯æŽ¥æ”¶1ä¸ªå­—èŠ‚çš„æ—¶é—´
+	SET_PERI_REG_MASK(UART_CONF1(UART0),UART_RX_TOUT_EN);             //ä½¿èƒ½ä¸Šè¿°ï¼Œè¶…æ—¶ä¸­æ–­åŠŸèƒ½
+	SET_PERI_REG_MASK(UART_INT_ENA(UART0), UART_RXFIFO_TOUT_INT_ENA); //ä½¿èƒ½è¶…æ—¶æŽ¥æ”¶ä¸­æ–­
+	WRITE_PERI_REG(UART_INT_CLR(UART0), 0xffff);                      //æ¸…é™¤å…¨éƒ¨ä¸­æ–­æ ‡å¿—
+	ETS_UART_INTR_ENABLE();                                           //å¼€ä¸²å£æ€»ä¸­æ–­
 }
 /******************************************************************************
  * FunctionName : uart1_tx_one_char

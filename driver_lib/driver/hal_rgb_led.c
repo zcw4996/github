@@ -12,7 +12,7 @@
 *            www.gizwits.com
 *
 *********************************************************/
-
+#include "init.h"
 #include "driver/hal_rgb_led.h"
 #include "osapi.h"
 
@@ -131,7 +131,8 @@ void ICACHE_FLASH_ATTR rgbGpioInit(void)
 
     gpio_output_set(0, 0, GPIO_ID_PIN(GPIO_RGB_SCL) | GPIO_ID_PIN(GPIO_RGB_SDA), 0); //| GPIO_ID_PIN(GPIO_RGB_POW)
 
-    os_printf("rgbGpioInit \r\n");
+    DNS_SERVER_DEBUG("rgbGpioInit \r\n");
+
 }
 
 void ICACHE_FLASH_ATTR rgbSensorTest(uint8_t rgbcou)

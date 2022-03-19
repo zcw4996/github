@@ -10,7 +10,7 @@
  *  DNS server use UDP protocol and the port is 53, so we just need creat a UDP 
  * server on port 53 then receive and response data.
  * 
- * DNS銆�requst data :
+ * DNS闁靛棴鎷穜equst data :
  * 
  *  -------------------------------------------------
  *    | Transaction ID | Flags                  |
@@ -38,21 +38,14 @@
 //#include "base64.h"
 //#include "esp_spiffs.h"
 #include "uart.h"
+#include "init.h"
 //#include "sysparam.h"
 
-
-//#define GLOBAL_DEBUG
- 
-#if defined(GLOBAL_DEBUG)
-#define DNS_SERVER_DEBUG(format, ...) os_printf("[%s:%d]" format "\r\n", __FILE__,__LINE__,##__VA_ARGS__)
-#else
-#define DNS_SERVER_DEBUG(format, ...) 
-#endif
 
 char dns_buf[128];
 unsigned char dns_i = 0;
 static struct espconn dns_esp_conn;
-struct espconn Dns_Client_conn;     //建立一个espconn结构体
+struct espconn Dns_Client_conn;     //瀵よ櫣鐝涙稉鈧稉鐚爏pconn缂佹挻鐎担锟�
 static struct espconn *client_esp_conn;
 /******************************************************************************
  * FunctionName : dns_server_recv
@@ -64,15 +57,15 @@ static struct espconn *client_esp_conn;
 *******************************************************************************/
 void  dns_server_recv(void *arg, char *pusrdata, unsigned short len)
 {
-	uint32 IP_addr[4] = {0,0,0,0};      //用以存储解析好的IP地址
+	uint32 IP_addr[4] = {0,0,0,0};      //閻€劋浜掔€涙ê鍋嶇憴锝嗙€芥總鐣屾畱IP閸︽澘娼�
     uint32 Auto_Web_State = 0;
  #if defined(GLOBAL_DEBUG)
-    os_printf("dns data:");
+    DNS_SERVER_DEBUG("dns data:");
     for(dns_i = 0;dns_i < len; dns_i ++)
     {
-        os_printf("%c ", pusrdata[dns_i]);
+        DNS_SERVER_DEBUG("%c ", pusrdata[dns_i]);
     }
-    os_printf("\r\n");
+    DNS_SERVER_DEBUG("\r\n");
 #endif
 /* Iphone: captive.apple.com/hotspot_detect.html
  * XiaoMI: connect.rom.miui.com/generate_204
@@ -98,22 +91,22 @@ void  dns_server_recv(void *arg, char *pusrdata, unsigned short len)
     Spi_FlashRead(IS_AUTO_WEB_Erase,IS_AUTO_WEB_ERASE_OFFSET,&Auto_Web_State,4);
     if(Auto_Web_State == NO_AUTO_ACCESS_WEB)
     {
-    	//os_printf("NO_AUTO_ACCESS_WEB\n");
+    	DNS_SERVER_DEBUG("NO_AUTO_ACCESS_WEB\n");
     	if(strstr(pusrdata+0xc,"www.GX_NTP.com"))
     	{
-         // os_printf("www.GX_NTP.com\n");
+          DNS_SERVER_DEBUG("www.GX_NTP.com\n");
     	}
     	else if(strstr(pusrdata+0xc,"GX_NTP"))
     	{
-    		//os_printf("GX_NTP\n");
+    		DNS_SERVER_DEBUG("GX_NTP\n");
     	}
     	else if(strstr(pusrdata+0xc,"www.gx_ntp.com"))
     	{
-    		//os_printf("www.gx_ntp.com\n");
+    		DNS_SERVER_DEBUG("www.gx_ntp.com\n");
     	}
     	else if(strstr(pusrdata+0xc,"gx_ntp"))
     	{
-    		//os_printf("gx_ntp\n");
+    		DNS_SERVER_DEBUG("gx_ntp\n");
     	}
     	else
     	{
@@ -159,7 +152,7 @@ void  dns_server_recv(void *arg, char *pusrdata, unsigned short len)
 
     dns_buf[len++] =0x00;
     dns_buf[len++] =0x04;
-	Spi_FlashRead(LOCAL_Erase,LOCAL_IP_ERASE_OFFSET,IP_addr,4);  //从flash中读取本地IP 网关 子网掩码
+	Spi_FlashRead(LOCAL_Erase,LOCAL_IP_ERASE_OFFSET,IP_addr,4);  //娴犲穳lash娑擃叀顕伴崣鏍ㄦ拱閸︾檺P 缂冩垵鍙� 鐎涙劗缍夐幒鈺冪垳
     dns_buf[len++] = (char)IP_addr[0];
     dns_buf[len++] = (char)IP_addr[1];
     dns_buf[len++] = (char)IP_addr[2];
@@ -179,9 +172,9 @@ user_esp_platform_dns_found(const char *name, ip_addr_t *ipaddr, void *arg)
  {
 	int32_t TcpPort = 0,TcpType;
  	Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVER_PORT_ERASE_OFFSET, &TcpPort,1);
-	Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVER_TPYE_ERASE_OFFSET, &TcpType,1);/* 获取长连接还是短连接 */
+	Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVER_TPYE_ERASE_OFFSET, &TcpType,1);/* 閼惧嘲褰囬梹鑳箾閹恒儴绻曢弰顖滅叚鏉╃偞甯� */
 
-    os_printf("user_esp_platform_dns_found %d.%d.%d.%d\n",
+    DNS_SERVER_DEBUG("user_esp_platform_dns_found %d.%d.%d.%d\n",
 		 ipaddr->addr & 0xFF,(ipaddr->addr >> 8) & 0xFF,(ipaddr->addr >> 16) & 0xFF,(ipaddr->addr >> 24) & 0xFF);
          TcpClientToServer[0] =(char) (ipaddr->addr);
          TcpClientToServer[1] =(char) ((ipaddr->addr >> 8) & 0xFF);
@@ -189,11 +182,11 @@ user_esp_platform_dns_found(const char *name, ip_addr_t *ipaddr, void *arg)
          TcpClientToServer[3] =(char) ((ipaddr->addr >> 24) & 0xFF);
          if(TcpType != 'L')
          {
-              /* 短连接则在串口中完成连接 */
+              /* 閻叀绻涢幒銉ュ灟閸︺劋瑕嗛崣锝勮厬鐎瑰本鍨氭潻鐐村复 */
          }
          else
          {
-           AP_tcpclient_init(TcpClientToServer,TcpPort);/* 长连接则立刻连接 */
+           AP_tcpclient_init(TcpClientToServer,TcpPort);/* 闂€鑳箾閹恒儱鍨粩瀣煝鏉╃偞甯� */
          }
  }
 

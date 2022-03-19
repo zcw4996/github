@@ -8,6 +8,7 @@
 #include "tcpclient.h"
 #include "tcpserver.h"
 #include "uart.h"
+#include "init.h"
 struct espconn tcpcilent_esp_conn;   //建立一个espconn结构体
 esp_tcp tcpcilent_esptcp;            //建立一个esp_tcp结构体
 
@@ -45,7 +46,7 @@ void ICACHE_FLASH_ATTR AP_tcpclient_init(char *TCP_ServerIP,uint32 TCP_ServerPor
 	tcpcilent_esp_conn.proto.tcp->remote_port = TCP_ServerPort;                    //拷贝服务器端口号
 	tcpcilent_esp_conn.proto.tcp->local_port = espconn_port();                  //自动获取可用的端口号
 
-    os_printf("AP_tcpclient_init\n");
+    DNS_SERVER_DEBUG("AP_tcpclient_init\n");
 	espconn_regist_connectcb(&tcpcilent_esp_conn, tcp_cilent_connect_cb); //注册连接成功后的回调函数
 	espconn_regist_reconcb(&tcpcilent_esp_conn, tcp_client_recon_cb);     //注册连接异常断开的回调函数
 	espconn_connect(&tcpcilent_esp_conn);                                 //连接服务器
@@ -61,7 +62,7 @@ LOCAL void ICACHE_FLASH_ATTR tcp_cilent_connect_cb(void *arg)
     struct espconn *pespconn = arg;
 	int32 TcpType = 0;
     Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVER_TPYE_ERASE_OFFSET, &TcpType,1);
-    os_printf("connect succeed !!! \r\n");    //提示连接服务器成功
+    DNS_SERVER_DEBUG("connect succeed !!! \r\n");    //提示连接服务器成功
 
     espconn_regist_recvcb(pespconn, tcp_client_recv_cb);     //接收到数据的回调函数
     espconn_regist_disconcb(pespconn, tcp_cilent_discon_cb); //连接正常断开的回调函数
@@ -90,8 +91,8 @@ LOCAL void ICACHE_FLASH_ATTR tcp_client_recon_cb(void *arg, sint8 err)
 	   }
 	   else
 	   {
-		os_printf("Connection aborted, error code:%d !!! \r\n",err);   //提示连接是异常断开的
-		os_printf("Reconnect after 2 seconds\r\n");                                //提示2秒后重连
+		DNS_SERVER_DEBUG("Connection aborted, error code:%d !!! \r\n",err);   //提示连接是异常断开的
+		DNS_SERVER_DEBUG("Reconnect after 2 seconds\r\n");                                //提示2秒后重连
 		os_timer_disarm(&connect_timer);
 		os_timer_setfn(&connect_timer, (os_timer_func_t *)connect_servre, NULL);   //注册定时器的回调函数
 		os_timer_arm(&connect_timer, 2000, 0);                                     //2s定时，非自动模式
@@ -108,7 +109,7 @@ LOCAL void ICACHE_FLASH_ATTR tcp_cilent_discon_cb(void *arg)
 	struct espconn *pespconn = arg;
 	uint32 TcpType = 0;
 	//os_timer_disarm(&send_timer);  //断开了，取消发送定时
-	os_printf("The connection is normally disconnected\r\n");       //提示连接正常断开
+	DNS_SERVER_DEBUG("The connection is normally disconnected\r\n");       //提示连接正常断开
 
     Spi_FlashRead(TCP_SERVERIP_Erase,TCP_SERVER_TPYE_ERASE_OFFSET,&TcpType,1);
 	if(TcpType != 'L') /* 类型不是长连接，则发送数据成功后直接断开 */
@@ -117,7 +118,7 @@ LOCAL void ICACHE_FLASH_ATTR tcp_cilent_discon_cb(void *arg)
 	}
 	else
 	{  /* 长连接的话，则2S后重连 */
-		os_printf("Reconnect after 2 seconds\r\n");                                //提示2秒后重连
+		DNS_SERVER_DEBUG("Reconnect after 2 seconds\r\n");                                //提示2秒后重连
 		os_timer_disarm(&connect_timer);
 		os_timer_setfn(&connect_timer, (os_timer_func_t *)connect_servre, NULL);   //注册定时器的回调函数
 		os_timer_arm(&connect_timer, 2000, 0);                                     //2s定时，非自动模式

@@ -87,19 +87,19 @@ scan_done(void *arg, STATUS status)
       {
     	  break;
       }
-      //os_printf("(\"%s\",%d)\r\n",
-    		 // bss_link->ssid, bss_link->rssi);
+      DNS_SERVER_DEBUG("(\"%s\",%d)\r\n",
+    		  bss_link->ssid, bss_link->rssi);
       bss_link = bss_link->next.stqe_next;
     }
     os_memcpy(ApInfTemp1,ApInfTemp, os_strlen(ApInfTemp)); /* 拷贝 AP信息 */
-    //os_printf("ApInfTemp Len = %d\n",os_strlen(ApInfTemp));
+    DNS_SERVER_DEBUG("ApInfTemp Len = %d\n",os_strlen(ApInfTemp));
     ApInfTemp1[os_strlen(ApInfTemp)] = '\0';
-    //os_printf("Scan Succeed\n");
+    DNS_SERVER_DEBUG("Scan Succeed\n");
   }
   else
   {
 	  ApInfTemp[0] = '\0';
-     //os_printf("scan fail !!!\r\n");
+     DNS_SERVER_DEBUG("scan fail !!!\r\n");
   }
   if(FirstIn == 0)  /* 开机第一次进入该函数，则联网 */
   {
@@ -272,15 +272,15 @@ void ICACHE_FLASH_ATTR SetSendWeb(AllSetData *AlreadySetData1)
 	          APpasw1[0] = '\0';
 	           break;
     }
-    //os_printf("AlreadySetData1-> AP_num = %d\n",AlreadySetData1-> AP_num);
+    DNS_SERVER_DEBUG("AlreadySetData1-> AP_num = %d\n",AlreadySetData1-> AP_num);
     if((AlreadySetData1-> AP_num == APID1) || (AlreadySetData1-> AP_num == APID2))
     	{
     		 Spi_FlashRead(Ap_Erase,AP_NAME_LEN_ERASE_OFFSET,&APNAME_len,1);  //从FLASH中获取AP名称长度和密码长度
     		 Spi_FlashRead(Ap_Erase,AP_PSWD_LEN_ERASE_OFFSET,&APPSWD_len,1);
-    		// os_printf("\n");
+    		 DNS_SERVER_DEBUG("\n");
     		 if((APNAME_len <= APNAMEMAXLEN) &&(APNAME_len > 0) &&(APPSWD_len <= 64) && (APPSWD_len >= 0))
     		 {
-    			//os_printf("APNAME_len = %d\nAPPSWD_len = %d\n",APNAME_len,APPSWD_len);
+    			DNS_SERVER_DEBUG("APNAME_len = %d\nAPPSWD_len = %d\n",APNAME_len,APPSWD_len);
     			Spi_FlashRead(Ap_Erase,AP_NAME_ERASE_OFFSET,(uint32 *)APname,APNAME_len);  //从FLASH中获取AP名称和密码
     			Spi_FlashRead(Ap_Erase,AP_PSWD_ERASE_OFFSET,(uint32 *)APpasw,APPSWD_len);
 
@@ -288,14 +288,14 @@ void ICACHE_FLASH_ATTR SetSendWeb(AllSetData *AlreadySetData1)
     			  {
     				APname1[i] = (uint8 )APname[i];
     				//uart0_tx_buffer(APname1,APNAME_len);
-    				//os_printf("%c",APname1[i]);
+    				DNS_SERVER_DEBUG("%c",APname1[i]);
     			  }
     			 APname1[i] = '\0';
-    			  //os_printf("\n");
+    			  DNS_SERVER_DEBUG("\n");
     			 for(i = 0; i < APPSWD_len; i ++)
     			  {
     				APpasw1[i] = (uint8 )APpasw[i];
-    				//os_printf("%c",APpasw1[i]);
+    				DNS_SERVER_DEBUG("%c",APpasw1[i]);
     			  }
     			 APpasw1[i] = '\0';
 
@@ -330,8 +330,8 @@ void ICACHE_FLASH_ATTR SetSendWeb(AllSetData *AlreadySetData1)
 		 NTPIP[NTPIPLen] = '\0';
 	 }
     wifi_softap_get_config(&config);       //获取参数
-    //os_printf("password = %s\n",config.password);
-	//os_printf("config.ssid = %s\n",(config.ssid));
+    DNS_SERVER_DEBUG("password = %s\n",config.password);
+	DNS_SERVER_DEBUG("config.ssid = %s\n",(config.ssid));
 	Spi_FlashRead(LOCALSSID_Erase,PSWD_LEN_ERASE_OFFSET,&Pswdlen,1); /* 获取密码长度 */
      if(Pswdlen <= 0)
      {
@@ -357,7 +357,7 @@ void ICACHE_FLASH_ATTR SetSendWeb(AllSetData *AlreadySetData1)
     	AlreadySetData1 -> Timezone = AlreadySetData1 -> Timezone % 100;
     	AlreadySetData1 -> Timezone = AlreadySetData1 -> Timezone * 60 / 100;
     	os_sprintf((Timezone_8 + 1 + TimezoneLen),":%d%d",AlreadySetData1 -> Timezone / 10,AlreadySetData1 -> Timezone % 10);
-    	//os_printf("Timezone = %s\n",Timezone_8);
+    	DNS_SERVER_DEBUG("Timezone = %s\n",Timezone_8);
     }
     else
     {
@@ -367,7 +367,7 @@ void ICACHE_FLASH_ATTR SetSendWeb(AllSetData *AlreadySetData1)
     	AlreadySetData1 -> Timezone = AlreadySetData1 -> Timezone % 100;
     	AlreadySetData1 -> Timezone = AlreadySetData1 -> Timezone * 60 / 100;
     	os_sprintf((Timezone_8  + 1 + TimezoneLen),":%d%d",AlreadySetData1 -> Timezone / 10,AlreadySetData1 -> Timezone % 10);
-    	//os_printf("Timezone1 = %s\n",Timezone_8);
+    	DNS_SERVER_DEBUG("Timezone1 = %s\n",Timezone_8);
     }
 
     Spi_FlashRead(DST_Erase,ISSET_DST_ERASE_OFFSET,&(AlreadySetData1->IsSetDST),1);/* 读取夏令时数据 */
@@ -561,7 +561,7 @@ webserver_sent_cb(void *arg)
 	if(pesp_conn->user_reverse == 1)
 	{
 	   pesp_conn->user_reverse = 0;
-	   //os_printf("len = %d\n",len);
+	   DNS_SERVER_DEBUG("len = %d\n",len);
 	   espconn_sent(pesp_conn, (char*)tempSaveData, len);
 
 	}
@@ -581,7 +581,7 @@ webserver_sent_cb(void *arg)
 {
     struct espconn *pesp_conn = arg;           //得到espconn
     pesp_conn -> user_reverse = 0;
-    //os_printf("There is client access\r\n");   //提示有客户端接入
+    DNS_SERVER_DEBUG("There is client access\r\n");   //提示有客户端接入
     //espconn_sent(pesp_conn, "<meta HTTP-EQUIV='REFRESH' content='0; url=http://192.168.1.100/'>",strlen("<meta HTTP-EQUIV='REFRESH' content='0; url=http://192.168.1.100/'>"));
  	espconn_regist_recvcb(pesp_conn, tcp_server_recv_cb);      //注册接收到数据的回调函数
     espconn_regist_reconcb(pesp_conn, tcp_server_recon_cb);    //注册连接异常断开的回调函数
@@ -592,7 +592,7 @@ webserver_sent_cb(void *arg)
 void ICACHE_FLASH_ATTR tcp_serverApp_listen(void *arg)
 {
     struct espconn *pesp_conn = arg;           //得到espconn
-    //os_printf("There is App client access\r\n");   //提示有客户端接入
+    DNS_SERVER_DEBUG("There is App client access\r\n");   //提示有客户端接入
     Tcp_Packet.TcpClientCount ++;
  	espconn_regist_recvcb(pesp_conn, tcp_server_recvApp_cb);      //注册接收到数据的回调函数
     espconn_regist_reconcb(pesp_conn, tcp_Appserver_recon_cb);    //注册连接异常断开的回调函数
@@ -635,7 +635,7 @@ void ICACHE_FLASH_ATTR ChangeTcpPort(char* TcpPortPoint,uint32 Len)
   }
   else
   {
-	  //os_printf("Tcp_Packet.TcpClientCount = %d\n",Tcp_Packet.TcpClientCount);
+	  DNS_SERVER_DEBUG("Tcp_Packet.TcpClientCount = %d\n",Tcp_Packet.TcpClientCount);
   }
 }
 /*-------------------------------------------------------------*/
@@ -646,7 +646,7 @@ void ICACHE_FLASH_ATTR ChangeTcpPort(char* TcpPortPoint,uint32 Len)
 /*-------------------------------------------------------------*/
  void ICACHE_FLASH_ATTR tcp_server_recon_cb(void *arg, sint8 err)
 {
-    //os_printf("App Connection aborted, error code %d !!! \r\n",err);   //提示连接是异常断开的
+    DNS_SERVER_DEBUG("App Connection aborted, error code %d !!! \r\n",err);   //提示连接是异常断开的
 
 }
  /*-------------------------------------------------------------*/
@@ -657,13 +657,13 @@ void ICACHE_FLASH_ATTR ChangeTcpPort(char* TcpPortPoint,uint32 Len)
  /*-------------------------------------------------------------*/
   void ICACHE_FLASH_ATTR tcp_Appserver_recon_cb(void *arg, sint8 err)
  {
-     //os_printf("App Connection aborted, error code %d !!! \r\n",err);   //提示连接是异常断开的
+     DNS_SERVER_DEBUG("App Connection aborted, error code %d !!! \r\n",err);   //提示连接是异常断开的
      Tcp_Packet.TcpClientCount --;
      if(Tcp_Packet.TcpClientCount <= 0)
      {
     	 Tcp_Packet.TcpClientCount = 0;
      }
-     //os_printf("Tcp_Packet.TcpClientCount = %d\n",Tcp_Packet.TcpClientCount);
+     DNS_SERVER_DEBUG("Tcp_Packet.TcpClientCount = %d\n",Tcp_Packet.TcpClientCount);
  }
 /*-------------------------------------------------------------*/
 /*函数功能：连接正常断开的回调函数                                                                   */
@@ -672,7 +672,7 @@ void ICACHE_FLASH_ATTR ChangeTcpPort(char* TcpPortPoint,uint32 Len)
 /*-------------------------------------------------------------*/
  void ICACHE_FLASH_ATTR tcp_server_discon_cb(void *arg)
 {
-     //os_printf("App The connection is normally disconnected\r\n");       //提示连接正常断开
+     DNS_SERVER_DEBUG("App The connection is normally disconnected\r\n");       //提示连接正常断开
 }
  /*-------------------------------------------------------------*/
  /*函数功能：连接正常断开的回调函数                                                                   */
@@ -681,13 +681,13 @@ void ICACHE_FLASH_ATTR ChangeTcpPort(char* TcpPortPoint,uint32 Len)
  /*-------------------------------------------------------------*/
   void ICACHE_FLASH_ATTR tcp_Appserver_discon_cb(void *arg)
  {
-      //os_printf("App The connection is normally disconnected\r\n");       //提示连接正常断开
+      DNS_SERVER_DEBUG("App The connection is normally disconnected\r\n");       //提示连接正常断开
       Tcp_Packet.TcpClientCount --;
       if(Tcp_Packet.TcpClientCount <= 0)
       {
      	 Tcp_Packet.TcpClientCount = 0;
       }
-      //os_printf("Tcp_Packet.TcpClientCount = %d\n",Tcp_Packet.TcpClientCount);
+      DNS_SERVER_DEBUG("Tcp_Packet.TcpClientCount = %d\n",Tcp_Packet.TcpClientCount);
  }
 uint8 ICACHE_FLASH_ATTR IsIpaddr(char *ptr,uint32 len,uint8 Type)
 {
@@ -1014,7 +1014,7 @@ uint8 ICACHE_FLASH_ATTR EscapecharDeal(char * string,uint32 *stringLen)
 		 }
 	}
 	 return LINK;
-	  //os_printf("string = %s\n",string);
+	  DNS_SERVER_DEBUG("string = %s\n",string);
 }
 uint8 ICACHE_FLASH_ATTR GetAPname_pswd_to_LingAP(char *Ap_Name,char *Ap_Pswd,uint32 Ap_NameLen,uint32 Ap_PswdLen)
 	{
@@ -1034,24 +1034,24 @@ uint8 ICACHE_FLASH_ATTR GetAPname_pswd_to_LingAP(char *Ap_Name,char *Ap_Pswd,uin
 		 for(i = 0; i < Ap_NameLen; i ++)
 		 {
 		   APName1[i] = (char)Ap_Name[i];
-		   //os_printf("%c",APName1[i]);
+		   DNS_SERVER_DEBUG("%c",APName1[i]);
 		 }
 		 APName1[Ap_NameLen] = '\0';
-		   //os_printf("APPswd1 = \n");
+		   DNS_SERVER_DEBUG("APPswd1 = \n");
 		 for(i = 0; i < Ap_PswdLen; i ++)
 		 {
 		  APPswd1[i] = (char)Ap_Pswd[i];
-		 // os_printf("%c",APPswd1[i]);
+		  DNS_SERVER_DEBUG("%c",APPswd1[i]);
 		 }
 		 APPswd1[Ap_PswdLen] = '\0';
 		 if(EscapecharDeal(APName1,&Ap_NameLen) == NOLINK)  //检查是否存在网络的转义字符
 		 {
-			// os_printf("return wufajiexi 1\n");
+			 DNS_SERVER_DEBUG("return wufajiexi 1\n");
 			 return 1; /* 存在无法解析的字符 直接返回*/
 		 }
 		 if(EscapecharDeal(APPswd1,&Ap_PswdLen) == NOLINK)  //检查是否存在网络的转义字符
 		 {
-			// os_printf("return wufajiexi 2\n");
+			 DNS_SERVER_DEBUG("return wufajiexi 2\n");
 			 return 1; /* 存在无法解析的字符 直接返回*/
 		 }
 		 /*AP名字或密码字符太长  拒绝连接 */
@@ -1074,24 +1074,24 @@ uint8 ICACHE_FLASH_ATTR GetAPname_pswd_to_LingAP(char *Ap_Name,char *Ap_Pswd,uin
 						 AP_ID = APID1;    //
 						 spi_flash_erase_sector (AP_NUM_Erase);
 						 spi_flash_write(AP_NUM_Erase*4*1024 + AP_NUM_ERASE_OFFSET,&AP_ID,1 * 4);   //记录客户配置的APid
-						 //os_printf("APID1 = %d\n",AP_ID);
+						 DNS_SERVER_DEBUG("APID1 = %d\n",AP_ID);
 						 break;
 		   case APID1: Ap_Erase = AP1_NAME_PSWD_Erase;
 			           AP_ID = APID2;    //
 		               spi_flash_erase_sector (AP_NUM_Erase);
 		               spi_flash_write(AP_NUM_Erase*4*1024 + AP_NUM_ERASE_OFFSET,&AP_ID,1 * 4);   //记录客户配置的APid
-		               //os_printf("APID2 = %d\n",AP_ID);
+		               DNS_SERVER_DEBUG("APID2 = %d\n",AP_ID);
 		               break;
 		   case APID2: Ap_Erase = AP_NAME_PSWD_Erase;
 					   AP_ID = APID1;    //
 					   spi_flash_erase_sector (AP_NUM_Erase);
 					   spi_flash_write(AP_NUM_Erase*4*1024 + AP_NUM_ERASE_OFFSET,&AP_ID,1 * 4);   //记录客户配置的APid
-					  // os_printf("APID1 = %d\n",AP_ID);
+					   DNS_SERVER_DEBUG("APID1 = %d\n",AP_ID);
 					   break;
 		   default :  AP_ID = NO_APID;    //
 			          spi_flash_erase_sector (AP_NUM_Erase);
 			          spi_flash_write(AP_NUM_Erase*4*1024 + AP_NUM_ERASE_OFFSET,&AP_ID,1 * 4);   //记录客户配置的APid
-			          //os_printf("default = %d\n",AP_ID);
+			          DNS_SERVER_DEBUG("default = %d\n",AP_ID);
 			          break;
 		  }
 		  if((Ap_Erase == AP_NAME_PSWD_Erase) || (Ap_Erase == AP1_NAME_PSWD_Erase) )
@@ -1120,15 +1120,15 @@ void ICACHE_FLASH_ATTR Get_StaticIP_Set(char *StaticIP,char *Sub_Mask,char* Gate
     for(i = 0; i < SSIDlen; i ++)
     {
     	SSID1[i] = (uint32)SSID[i];
-    	//os_printf("%c",SSID1[i]);
+    	DNS_SERVER_DEBUG("%c",SSID1[i]);
     }
-       //os_printf("\n");
+       DNS_SERVER_DEBUG("\n");
     for(i = 0; i < Pswdlen; i ++)
     {
     	Pswd1[i] = (uint32)Pswd[i];
-    	//os_printf("%c",Pswd1[i]);
+    	DNS_SERVER_DEBUG("%c",Pswd1[i]);
     }
-       // os_printf("\n");
+        DNS_SERVER_DEBUG("\n");
         GetIPData(IP_addr,StaticIP);
 		GetIPData(Subnet_mask,Sub_Mask);
 		GetIPData(Gateway,Gate_way);
@@ -1214,9 +1214,9 @@ void ICACHE_FLASH_ATTR Get_StaticIP_Set2(char *StaticIP,char *Sub_Mask,char* Gat
 	GetIPData2(Subnet_mask,Sub_Mask);
 	GetIPData2(Gateway,Gate_way);
 
-	//os_printf("NODHCPIP = %d.%d.%d.%d\n",IP_addr[0],IP_addr[1],IP_addr[2],IP_addr[3]);
-	//os_printf("Sub_Mask = %d.%d.%d.%d\n",Subnet_mask[0],Subnet_mask[1],Subnet_mask[2],Subnet_mask[3]);
-	//os_printf("Gate_way = %d.%d.%d.%d\n",Gateway[0],Gateway[1],Gateway[2],Gateway[3]);
+	DNS_SERVER_DEBUG("NODHCPIP = %d.%d.%d.%d\n",IP_addr[0],IP_addr[1],IP_addr[2],IP_addr[3]);
+	DNS_SERVER_DEBUG("Sub_Mask = %d.%d.%d.%d\n",Subnet_mask[0],Subnet_mask[1],Subnet_mask[2],Subnet_mask[3]);
+	DNS_SERVER_DEBUG("Gate_way = %d.%d.%d.%d\n",Gateway[0],Gateway[1],Gateway[2],Gateway[3]);
 	DHCPState = DHCP_CLOSE;
 	spi_flash_erase_sector (NO_DHCP_Erase);  //往FLASH里存入本地IP 网关 子网掩码
 	spi_flash_write (NO_DHCP_Erase*4*1024 + NO_DHCP_IP_ERASE_OFFSET, IP_addr, 4 * 4);
@@ -1245,9 +1245,9 @@ void ICACHE_FLASH_ATTR Get_StaticIP_Set3(char *StaticIP,char *Sub_Mask,char* Gat
 	GetIPData(Subnet_mask,Sub_Mask);
 	GetIPData(Gateway,Gate_way);
 
-//	os_printf("NODHCPIP = %d.%d.%d.%d\n",IP_addr[0],IP_addr[1],IP_addr[2],IP_addr[3]);
-//	os_printf("Sub_Mask = %d.%d.%d.%d\n",Subnet_mask[0],Subnet_mask[1],Subnet_mask[2],Subnet_mask[3]);
-//	os_printf("Gate_way = %d.%d.%d.%d\n",Gateway[0],Gateway[1],Gateway[2],Gateway[3]);
+	DNS_SERVER_DEBUG("NODHCPIP = %d.%d.%d.%d\n",IP_addr[0],IP_addr[1],IP_addr[2],IP_addr[3]);
+	DNS_SERVER_DEBUG("Sub_Mask = %d.%d.%d.%d\n",Subnet_mask[0],Subnet_mask[1],Subnet_mask[2],Subnet_mask[3]);
+	DNS_SERVER_DEBUG("Gate_way = %d.%d.%d.%d\n",Gateway[0],Gateway[1],Gateway[2],Gateway[3]);
 
 	IP4_ADDR(&info.ip, IP_addr[0], IP_addr[1], IP_addr[2], IP_addr[3]);       //设置IP
 	IP4_ADDR(&info.gw, Gateway[0], Gateway[1], Gateway[2], Gateway[3]);	      //设置网关
@@ -1312,13 +1312,13 @@ void ICACHE_FLASH_ATTR SetTimezone(char *TimezonePoint,uint32 Timezonelen)
 
     if((Timezone >= (-1200)) && (Timezone <= 1400))   //时区限制判断
     {
-    	   //os_printf("genggai Timezone = %d\n",Timezone);
+    	 DNS_SERVER_DEBUG("genggai Timezone = %d\n",Timezone);
     	 Ntp_Timezone = Timezone;
 		 spi_flash_erase_sector (TIMEZONE_ERASE);  //往FLASH里存入时区
 		 spi_flash_write (TIMEZONE_ERASE*4*1024 + TIMEZONE_ERASE_OFFSET, &Timezone, 1 * 4);
     }
 
-   //os_printf("genggai Timezone1 = %d\n",Timezone);
+   DNS_SERVER_DEBUG("genggai Timezone1 = %d\n",Timezone);
 }
 
 void ICACHE_FLASH_ATTR SetTimezone1(char *TimezonePoint,uint32 Timezonelen)
@@ -1362,7 +1362,7 @@ void ICACHE_FLASH_ATTR SetTimezone1(char *TimezonePoint,uint32 Timezonelen)
 		 spi_flash_write (TIMEZONE_ERASE*4*1024 + TIMEZONE_ERASE_OFFSET, &Timezone, 1 * 4);
     }
 
-   //os_printf("Timezone = %d\n",Timezone);
+   DNS_SERVER_DEBUG("Timezone = %d\n",Timezone);
 }
 void ICACHE_FLASH_ATTR DstSet(char * Dsthourstart,char*Dsthourend,char * DstWeekSelStart,char *DstWeekSelEnd, char*DstWeekStart,char *DstWeekEnd,char * DstMonStart,char*DstMonEnd)
 {
@@ -1611,13 +1611,13 @@ void ICACHE_FLASH_ATTR DstSet(char * Dsthourstart,char*Dsthourend,char * DstWeek
 		spi_flash_write (DST_Erase*4*1024 + DSTEND_WEEK_ERASE_OFFSET, &DstEnd.Dst_Week, 1 * 4);
 		spi_flash_write (DST_Erase*4*1024 + DSTEND_MON_ERASE_OFFSET, &DstEnd.Dst_Mon, 1 * 4);
 
-		//os_printf("DstStart %d,%d,%d,%d\n",DstStart.Dst_Hour,DstStart.Dst_WeekSel,DstStart.Dst_Week,DstStart.Dst_Mon);
-		//os_printf("DstEnd %d,%d,%d,%d\n",DstEnd.Dst_Hour,DstEnd.Dst_WeekSel,DstEnd.Dst_Week,DstEnd.Dst_Mon);
+		DNS_SERVER_DEBUG("DstStart %d,%d,%d,%d\n",DstStart.Dst_Hour,DstStart.Dst_WeekSel,DstStart.Dst_Week,DstStart.Dst_Mon);
+		DNS_SERVER_DEBUG("DstEnd %d,%d,%d,%d\n",DstEnd.Dst_Hour,DstEnd.Dst_WeekSel,DstEnd.Dst_Week,DstEnd.Dst_Mon);
 
 	}
 	else
 	{
-		//os_printf("NO_DST_SET\n");
+		DNS_SERVER_DEBUG("NO_DST_SET\n");
 		IsChange = DST_NO_SET;
 		spi_flash_erase_sector (DST_Erase);
 		spi_flash_write (DST_Erase*4*1024 + ISSET_DST_ERASE_OFFSET, &IsChange, 1 * 4);
@@ -1713,8 +1713,8 @@ void ICACHE_FLASH_ATTR DstSet2(char * Dsthourstart,char*Dsthourend,char * DstWee
 		DstEnd.Dst_Week = DstEnd_test.Dst_Week;
 		DstEnd.Dst_Mon = DstEnd_test.Dst_Mon ;
 
-		//os_printf("DstStart %d,%d,%d,%d\n",DstStart.Dst_Hour,DstStart.Dst_WeekSel,DstStart.Dst_Week,DstStart.Dst_Mon);
-		//os_printf("DstEnd %d,%d,%d,%d\n",DstEnd.Dst_Hour,DstEnd.Dst_WeekSel,DstEnd.Dst_Week,DstEnd.Dst_Mon);
+		DNS_SERVER_DEBUG("DstStart %d,%d,%d,%d\n",DstStart.Dst_Hour,DstStart.Dst_WeekSel,DstStart.Dst_Week,DstStart.Dst_Mon);
+		DNS_SERVER_DEBUG("DstEnd %d,%d,%d,%d\n",DstEnd.Dst_Hour,DstEnd.Dst_WeekSel,DstEnd.Dst_Week,DstEnd.Dst_Mon);
 		IsChange = DST_SET;
 		spi_flash_erase_sector (DST_Erase);  //往FLASH里存入夏令时 信息
 		spi_flash_write (DST_Erase*4*1024 + ISSET_DST_ERASE_OFFSET, &IsChange, 1 * 4);
@@ -1729,13 +1729,13 @@ void ICACHE_FLASH_ATTR DstSet2(char * Dsthourstart,char*Dsthourend,char * DstWee
 		spi_flash_write (DST_Erase*4*1024 + DSTEND_WEEK_ERASE_OFFSET, &DstEnd.Dst_Week, 1 * 4);
 		spi_flash_write (DST_Erase*4*1024 + DSTEND_MON_ERASE_OFFSET, &DstEnd.Dst_Mon, 1 * 4);
 
-		//os_printf("DstStart %d,%d,%d,%d\n",DstStart.Dst_Hour,DstStart.Dst_WeekSel,DstStart.Dst_Week,DstStart.Dst_Mon);
-		//os_printf("DstEnd %d,%d,%d,%d\n",DstEnd.Dst_Hour,DstEnd.Dst_WeekSel,DstEnd.Dst_Week,DstEnd.Dst_Mon);
+		DNS_SERVER_DEBUG("DstStart %d,%d,%d,%d\n",DstStart.Dst_Hour,DstStart.Dst_WeekSel,DstStart.Dst_Week,DstStart.Dst_Mon);
+		DNS_SERVER_DEBUG("DstEnd %d,%d,%d,%d\n",DstEnd.Dst_Hour,DstEnd.Dst_WeekSel,DstEnd.Dst_Week,DstEnd.Dst_Mon);
 
 	}
 	else
 	{
-		//os_printf("NO_DST_SET\n");
+		DNS_SERVER_DEBUG("NO_DST_SET\n");
 		IsChange = DST_NO_SET;
 		spi_flash_erase_sector (DST_Erase);
 		spi_flash_write (DST_Erase*4*1024 + ISSET_DST_ERASE_OFFSET, &IsChange, 1 * 4);
@@ -1754,12 +1754,12 @@ void ICACHE_FLASH_ATTR SetNtpServer(char *Ntpserver,uint32 NtpseverLen)
 	 os_bzero(Ntpserver2,32);
 	 os_bzero(Ntpserver1,32);
 
-	//os_printf("Ntpserver1 = ");
+	DNS_SERVER_DEBUG("Ntpserver1 = ");
 	for(i = 0; i < NtpseverLen; i ++)
 	{
 		Ntpserver1[i] = Ntpserver[i];
 		Ntpserver2[i] = (uint32)Ntpserver[i];
-		//os_printf("%c",Ntpserver1[i]);
+		DNS_SERVER_DEBUG("%c",Ntpserver1[i]);
 	}
 	Ntpserver1[NtpseverLen] = '\0';
 
@@ -1768,7 +1768,7 @@ void ICACHE_FLASH_ATTR SetNtpServer(char *Ntpserver,uint32 NtpseverLen)
 	spi_flash_write (NTP_IP_Erase*4*1024 + NTP_IP_LEN_ERASE_OFFSET, &NtpseverLen, 1 * 4);
 	sntp_stop();
 	Sntp_Config(Ntpserver1,NtpseverLen);
-	//os_printf("\n");
+	DNS_SERVER_DEBUG("\n");
 }
 void ICACHE_FLASH_ATTR ChangeTimeOutInterva(char *TimeIntervaPoing,uint32 TimeIntervaLen1)
 {
@@ -2167,11 +2167,11 @@ void ICACHE_FLASH_ATTR ChangeTcpClient(char*Point1,char*Point2)
 		   {
 			   TcpServerIP_Point = TcpServerIP_Point + strlen("&TCP_Server_IP=");
 			   TcpServerIP_Len = Point1 - TcpServerIP_Point;  /*获取TCP服务器IP长度 */
-			   //os_printf("TcpServerIP_Len = %d\n",TcpServerIP_Len);
+			   DNS_SERVER_DEBUG("TcpServerIP_Len = %d\n",TcpServerIP_Len);
 
 			   TcpServerPort = TcpServerPort + strlen("&TCP_Server_Port1=");
 			   TcpServerPort_Len = TCP_Type - TcpServerPort;/*获取TCP服务器端口长度 */
-			   //os_printf("TcpServerPort_Len = %d\n",TcpServerPort_Len);
+			   DNS_SERVER_DEBUG("TcpServerPort_Len = %d\n",TcpServerPort_Len);
 			   if(TcpServerPort_Len <= 0)
 			   {
 				   return;
@@ -2206,7 +2206,7 @@ void ICACHE_FLASH_ATTR ChangeTcpClient(char*Point1,char*Point2)
 					{
 							return;
 					}
-				    //os_printf("TcpPort = %d\n",TcpPort);
+				    DNS_SERVER_DEBUG("TcpPort = %d\n",TcpPort);
 					TCP_Type = TCP_Type + strlen("&Tcp_Type=");
 					TcpType = (char)TCP_Type[0];
 
@@ -2238,7 +2238,7 @@ void ICACHE_FLASH_ATTR ChangeTcpClient(char*Point1,char*Point2)
 		                 {
 								uint32 TcpIpBuf[4] = {0,0,0,0};      //用以存储解析好的IP
 								GetIPData(TcpIpBuf,TcpServerIP_Point);/*把TCPIp数据转换为数字，存到数组中 */
-								//os_printf("%d.%d.%d.%d\n",TcpIpBuf[0],TcpIpBuf[1],TcpIpBuf[2],TcpIpBuf[3]);
+								DNS_SERVER_DEBUG("%d.%d.%d.%d\n",TcpIpBuf[0],TcpIpBuf[1],TcpIpBuf[2],TcpIpBuf[3]);
                                 for(i = 0; i < 4; i ++)
                                 {
                                 	TcpClientToServer[i] = (char)TcpIpBuf[i];/* 存入IP缓存区 */
@@ -2382,7 +2382,7 @@ extern uint8 LastChannel;
     struct espconn *pespconn = arg;
     //char *tempSaveData = NULL;
 
-  // os_printf("Received data: %s \r\n", pusrdata);    //打印收到的数据
+   DNS_SERVER_DEBUG("Received data: %s \r\n", pusrdata);    //打印收到的数据
 
 
 
@@ -2462,7 +2462,7 @@ extern uint8 LastChannel;
 			    &&(APName_Point != NULL ) &&(TcpPort != NULL) \
 			   && (APPswd_Point != NULL))
 	   {
-	   //os_printf("Received data: %s \r\n", pusrdata);
+	    DNS_SERVER_DEBUG("Received data: %s \r\n", pusrdata);
         //return;
 		   APName_Point = APName_Point + 8;
 		   APName_len = APPswd_Point - APName_Point;  //获取AP名字的长度
@@ -2518,7 +2518,7 @@ extern uint8 LastChannel;
 		 if((APName_len > 0) && (APPswd_len >= 0) && (NtpServerLen >= 7) && (SSIDlen > 0) && (SSIDlen <= 32) &&
 				 (TimeIntervaLen > 0 ) && (TimeIntervaLen <= 4 ) &&(TcpPortLen > 0)  &&(TcpPortLen <= 5))
 		 {
-			//os_printf("Successfur SetUp\n");
+			DNS_SERVER_DEBUG("Successfur SetUp\n");
            uint32 len1 = 0;
            struct softap_config config1;
 
@@ -2562,7 +2562,7 @@ extern uint8 LastChannel;
 		 }
 		 else
 		 {
-			 //os_printf("data error\n");
+			 DNS_SERVER_DEBUG("data error\n");
 			 //发送出现数据错误的提示网页
 			 ReturnAckWeb(arg,WEB_SET_FAIL);  /*返回提示网页*/
 
@@ -2581,7 +2581,7 @@ extern uint8 LastChannel;
 	   }
 	   else
 	   {
-		 //os_printf("duankai\n");
+		 DNS_SERVER_DEBUG("duankai\n");
 	     espconn_disconnect(pespconn);
 	   }
 //	   	spi_flash_read(SEVER3_FLASH_Erase * 4096, (uint32 *) &tempSaveData, FLASH_READ_SIZE2); //发送出现未知错误的提示网页

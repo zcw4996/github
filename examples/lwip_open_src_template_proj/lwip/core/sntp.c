@@ -522,7 +522,7 @@ sntp_mktm_r(const time_t * tim_p ,struct tm *res ,int is_gmtime)
     }
   else
     res->tm_isdst = 0;
-//  os_printf("res %d %d %d %d %d\n",res->tm_year,res->tm_mon,res->tm_mday,res->tm_yday,res->tm_hour);
+  DNS_SERVER_DEBUG("res %d %d %d %d %d\n",res->tm_year,res->tm_mon,res->tm_mday,res->tm_yday,res->tm_hour);
   return (res);
 }
 struct tm * ICACHE_FLASH_ATTR
@@ -823,7 +823,7 @@ sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, ip_addr_t *addr, u16_t
   u8_t stratum;
   u32_t receive_timestamp[SNTP_RECEIVE_TIME_SIZE];
   err_t err;
-//os_printf("sntp_recv\n");
+  DNS_SERVER_DEBUG("sntp_recv\n");
   LWIP_UNUSED_ARG(arg);
   LWIP_UNUSED_ARG(pcb);
 
@@ -906,7 +906,7 @@ static void ICACHE_FLASH_ATTR
 sntp_send_request(ip_addr_t *server_addr)
 {
   struct pbuf* p;
-//  os_printf("sntp_send_request\n");
+  DNS_SERVER_DEBUG("sntp_send_request\n");
   p = pbuf_alloc(PBUF_TRANSPORT, SNTP_MSG_LEN, PBUF_RAM);
   if (p != NULL) {
     struct sntp_msg *sntpmsg = (struct sntp_msg *)p->payload;
@@ -985,7 +985,7 @@ sntp_request(void *arg)
 #endif /* SNTP_SERVER_DNS */
   {
     sntp_server_address = sntp_servers[sntp_current_server].addr;
-//    os_printf("sntp_server_address ip %d\n",sntp_server_address.addr);
+    DNS_SERVER_DEBUG("sntp_server_address ip %d\n",sntp_server_address.addr);
     err = (ip_addr_isany(&sntp_server_address)) ? ERR_ARG : ERR_OK;
   }
 
@@ -1072,7 +1072,7 @@ sntp_setserver(u8_t idx, ip_addr_t *server)
   if (idx < SNTP_MAX_SERVERS) {
     if (server != NULL) {
       sntp_servers[idx].addr = (*server);
-//      os_printf("server ip %d\n",server->addr);
+      DNS_SERVER_DEBUG("server ip %d\n",server->addr);
     } else {
       ip_addr_set_any(&sntp_servers[idx].addr);
     }

@@ -32,23 +32,26 @@
 #include "uart.h"
 #include "soft_timer.h"
 #include "Rgbled.h"
+
+#define VERSION   "GX_NTP_CLOCK_V1.0.0_20220319"
+
 uint32 If_Init_Set;
-uint32 SetDevideCount; /*¼ÇÂ¼ÉèÖÃÉè±¸µÄ´ÎÊı  */
+uint32 SetDevideCount; /*è®°å½•è®¾ç½®è®¾å¤‡çš„æ¬¡æ•°  */
 uint8_t LedChoose = 0;
 uint8_t isLedClose = 0;
 uint32 SysTime_ms;
 uint8 LastChannel;
-UartControlblock Uart0CB=     //´®¿Ú0µÄ¿ØÖÆµ¥Ôª,³õÊ¼²ÎÊı
+UartControlblock Uart0CB=     //ä¸²å£0çš„æ§åˆ¶å•å…ƒ,åˆå§‹å‚æ•°
 {
-    BIT_RATE_9600,   //115200²¨ÌØÂÊ
-	EIGHT_BITS,        //8Êı¾İÎ»
-	STICK_PARITY_DIS,  //²»¿ª¼ìÑéÊ¹ÄÜ
-	NONE_BITS,         //ÎŞĞ£Ñé
-	ONE_STOP_BIT,      //1¸öÍ£Ö¹Î»
+    BIT_RATE_9600,   //115200æ³¢ç‰¹ç‡
+	EIGHT_BITS,        //8æ•°æ®ä½
+	STICK_PARITY_DIS,  //ä¸å¼€æ£€éªŒä½¿èƒ½
+	NONE_BITS,         //æ— æ ¡éªŒ
+	ONE_STOP_BIT,      //1ä¸ªåœæ­¢ä½
 };
 
 
-void user_check_ip(void);     //º¯ÊıÉùÃ÷£¬¶¨Ê±Æ÷»Øµ÷º¯Êı
+void user_check_ip(void);     //å‡½æ•°å£°æ˜ï¼Œå®šæ—¶å™¨å›è°ƒå‡½æ•°
 void Check_Smart_Link(void);
 void Init_Set_up(void);
 void ICACHE_FLASH_ATTR vLink_AP(uint32 AP_ID);
@@ -107,13 +110,13 @@ extern UartDevice    UartDev;
 void to_scan(void)
 {
 	RgbInit();
-    //wifi_softap_dhcps_stop();                  //ÏÈÍ£Ö¹APÄ£Ê½ÏÂDHCP
+    //wifi_softap_dhcps_stop();                  //å…ˆåœæ­¢APæ¨¡å¼ä¸‹DHCP
 	UartDev.baut_rate = 9600;
 	uart_config(UART1);
-	uart0_init(&Uart0CB);  //´®¿Ú0³õÊ¼»¯£¬×¢Òâ´®¿Ú0µÄÊÕ·¢FIFOÊÇ128×Ö½Ú£¬·¢ËÍÊı¾İµÄÊ±ºò£¬²»ÒªÒç³ö
-	UART_SetPrintPort( UART1 );  /* ESP8266ÄÚ²¿ĞÅÏ¢´òÓ¡¿ÚÉèÖÃÎª´®¿Ú1*/
-    Spi_FlashRead(Init_Erase, 0,&If_Init_Set, 1);  //ÊÇ·ñĞèÒª»Ö¸´µ½³ö³§ÉèÖÃ
-    if(If_Init_Set != INIT_NO_SET)  //»Ö¸´µ½³ö³§ÉèÖÃ
+	uart0_init(&Uart0CB);  //ä¸²å£0åˆå§‹åŒ–ï¼Œæ³¨æ„ä¸²å£0çš„æ”¶å‘FIFOæ˜¯128å­—èŠ‚ï¼Œå‘é€æ•°æ®çš„æ—¶å€™ï¼Œä¸è¦æº¢å‡º
+	UART_SetPrintPort( UART1 );  /* ESP8266å†…éƒ¨ä¿¡æ¯æ‰“å°å£è®¾ç½®ä¸ºä¸²å£1*/
+    Spi_FlashRead(Init_Erase, 0,&If_Init_Set, 1);  //æ˜¯å¦éœ€è¦æ¢å¤åˆ°å‡ºå‚è®¾ç½®
+    if(If_Init_Set != INIT_NO_SET)  //æ¢å¤åˆ°å‡ºå‚è®¾ç½®
     {
       RecoveryData();
       //os_printf("huifuchuchangshezhi\n");
@@ -121,13 +124,13 @@ void to_scan(void)
 
       ConfigEsp82663(NULL);
 	  vGetStaticIP(STATIONAP_MODE);
-	  GetTcpClientInif();    /*   ÅäÖÃTcpClientÏà¹Ø²ÎÊı  */
+	  GetTcpClientInif();    /*   é…ç½®TcpClientç›¸å…³å‚æ•°  */
 	  os_timer_disarm(&Init_timer);
-	  os_timer_setfn(&Init_timer, (os_timer_func_t *)Init_Set_up, NULL);/* ´Ë¶¨Ê±Æ÷ÓÃÀ´¶¨Ê±É¨ÃèÖÜÎ§µÄAPĞÅÏ¢ */
+	  os_timer_setfn(&Init_timer, (os_timer_func_t *)Init_Set_up, NULL);/* æ­¤å®šæ—¶å™¨ç”¨æ¥å®šæ—¶æ‰«æå‘¨å›´çš„APä¿¡æ¯ */
 	  os_timer_arm(&Init_timer, 100, 1);
 	//wifi_station_dhcpc_start();
 	  os_timer_disarm(&Check_SmartConfig);
-	  os_timer_setfn(&Check_SmartConfig, (os_timer_func_t *)Check_Smart_Link, NULL);/* ´Ë¶¨Ê±Æ÷ÓÃÀ´¶¨Ê±¼ì²âÁ¬½ÓAPÇé¿ö£¬¸üĞÂRGB*/
+	  os_timer_setfn(&Check_SmartConfig, (os_timer_func_t *)Check_Smart_Link, NULL);/* æ­¤å®šæ—¶å™¨ç”¨æ¥å®šæ—¶æ£€æµ‹è¿æ¥APæƒ…å†µï¼Œæ›´æ–°RGB*/
 	  os_timer_arm(&Check_SmartConfig, 100, 1);
 }
 
@@ -140,7 +143,7 @@ void to_scan(void)
 *******************************************************************************/
 void ICACHE_FLASH_ATTR user_init(void)
 {
-	wifi_set_opmode(STATIONAP_MODE);          //ÉèÖÃwifiÄ£Ê½£ºAPÄ£Ê½
+	wifi_set_opmode(STATIONAP_MODE);          //è®¾ç½®wifiæ¨¡å¼ï¼šAPæ¨¡å¼
     system_init_done_cb(to_scan);
 
 }

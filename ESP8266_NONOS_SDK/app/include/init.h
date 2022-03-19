@@ -1,7 +1,7 @@
 /*
  * init.h
  *
- *  Created on: 2019Äê7ÔÂ28ÈÕ
+ *  Created on: 2019å¹´7æœˆ28æ—¥
  *      Author: Administrator
  */
 
@@ -10,6 +10,16 @@
 #include "ets_sys.h"
 #include "osapi.h"
 #include "user_interface.h"
+
+#define GLOBAL_DEBUG
+ 
+#if defined(GLOBAL_DEBUG)
+#define DNS_SERVER_DEBUG(format, ...) os_printf("[%s:%d]" format "\r\n", __FILE__,__LINE__,##__VA_ARGS__)
+#else
+#define DNS_SERVER_DEBUG(format, ...) 
+#endif
+#define SYS_LOG_SW  1
+
 void ICACHE_FLASH_ATTR GetTcpClientInif(void);
 void ICACHE_FLASH_ATTR user_set_station_config(char *ssid,char *password,uint32 ssidLen,uint32 PswdLen);
 void  ICACHE_FLASH_ATTR ipv4_to_str(uint8 if_index, unsigned int ipv4_addr);
