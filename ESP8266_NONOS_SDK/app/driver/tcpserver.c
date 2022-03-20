@@ -1766,7 +1766,6 @@ void ICACHE_FLASH_ATTR SetNtpServer(char *Ntpserver,uint32 NtpseverLen)
 	spi_flash_erase_sector (NTP_IP_Erase);  //往FLASH里存入NTP IP 信息
 	spi_flash_write (NTP_IP_Erase*4*1024 + NTP_IP_ERASE_OFFSET, Ntpserver2, NtpseverLen * 4);
 	spi_flash_write (NTP_IP_Erase*4*1024 + NTP_IP_LEN_ERASE_OFFSET, &NtpseverLen, 1 * 4);
-	sntp_stop();
 	Sntp_Config(Ntpserver1,NtpseverLen);
 	DNS_SERVER_DEBUG("\n");
 }

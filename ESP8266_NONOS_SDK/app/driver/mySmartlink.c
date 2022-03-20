@@ -12,6 +12,7 @@
 #include "spi_flash.h"
 #include "soft_timer.h"
 #include "tcpserver.h"
+#include "udpclient.h"
 #include "init.h"
 uint32 IsDst;//记录是否需要设置夏令时
 uint8 AlreadStartPutTime = 0;/* 记录是否已经成功从NTP服务器获取时间 */
@@ -20,7 +21,7 @@ uint8_t PackSend[18] = {0x1f,0x30,0x6d,0,0,0,0,0,0,0,0,0,0,0,0,0,0x09,0};
 void Spi_FlashRead(uint32 Erase_Point,uint32 Erase_Offset,uint32 * data_point,uint32 data_len);
 void SetDst(DstPacket * Dststart,DstPacket*Dstend,Dst_Packet*Ntp_data);
 void DealwithNtpStr(char *NtpData,Dst_Packet *DstData);
-LOCAL os_timer_t sntp_timer;//smartconfig_timer; //定义一个定时器结构，智能连接过程中，控制LED闪烁，起到指示的作用
+LOCAL os_timer_t my_sntp_timer;//smartconfig_timer; //定义一个定时器结构，智能连接过程中，控制LED闪烁，起到指示的作用
 extern uint32_t TimeOutInterva;
 extern  uint8_t isLedClose;
 void ICACHE_FLASH_ATTR DealwithNtpStr(char *NtpData,Dst_Packet *DstData)
@@ -97,7 +98,7 @@ void ICACHE_FLASH_ATTR DealwithNtpStr(char *NtpData,Dst_Packet *DstData)
 	  DstData -> Dst_year =  (uint32)((uint32)NtpData[i + 20] - 0x30 + DstData -> Dst_year);
    }
    DstData -> Dst_week = Get_Week(DstData -> Dst_year,DstData -> Dst_month,DstData -> Dst_day); /* 蔡乐公式获取星期 */
-   DNS_SERVER_DEBUG("DstData = %d-%d-%d-%d-%d-%d-%d\n",DstData -> Dst_year,DstData ->Dst_month,DstData -> Dst_day, DstData -> Dst_hour, DstData -> Dst_min, DstData -> Dst_sec,DstData->Dst_week);
+   //DNS_SERVER_DEBUG("DstData = %d-%d-%d-%d-%d-%d-%d\n",DstData -> Dst_year,DstData ->Dst_month,DstData -> Dst_day, DstData -> Dst_hour, DstData -> Dst_min, DstData -> Dst_sec,DstData->Dst_week);
 }
 /*返回这个月的第几周*/
 uint32 ICACHE_FLASH_ATTR ReturnMonSelWeek(Dst_Packet*Ntp_data2)
@@ -468,8 +469,7 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
      char *string ;
 	 uint32 hourstart = 0,hourend = 0;
 
-	 current_stamp = sntp_get_current_timestamp();
-	 current_stamp = current_stamp - 28800; /*  先让时区回到标准状态 */
+	 current_stamp =  get_current_stamp();
 	 RealTime = sntp_get_real_time(current_stamp + SEC_TIME_ZONE);
 
      for(i = 0; i < 32; i ++)
@@ -502,7 +502,7 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
 	 {
 		 AlreadStartPutTime = 0;
 		 LinkAPstate = 0;
-		 os_timer_disarm(&sntp_timer);
+		 os_timer_disarm(&my_sntp_timer);
 		 os_timer_disarm(&sntpPutTime);
 	 }
 	 else
@@ -558,8 +558,9 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
 	 PackSend[13] = (uint8_t)(Ntp_Data1.Dst_sec / 10 + 0x30);
 	 PackSend[14] = (uint8_t)(Ntp_Data1.Dst_sec % 10 + 0x30);
 	 PackSend[15] = (uint8_t)(Ntp_Data1. Dst_week + 0x30);
-	 DNS_SERVER_DEBUG("Ntp_Data1 = %d-%d-%d-%d-%d-%d\n",Ntp_Data1.Dst_year,Ntp_Data1.Dst_month,Ntp_Data1.Dst_day, Ntp_Data1.Dst_hour, Ntp_Data1.Dst_min, Ntp_Data1.Dst_sec);
-	 DNS_SERVER_DEBUG("sntp: %d, %s \n",current_stamp,	NTP_time);
+
+	DNS_SERVER_DEBUG("sntp: %d, %s \n",current_stamp,	NTP_time);
+
 
 }
 extern uint8_t LedChoose;
@@ -576,26 +577,28 @@ void ICACHE_FLASH_ATTR PutSntpTime(void)
 	LedRed(0);
 	SysTime_ms = 300;
 }
-//void ICACHE_FLASH_ATTR
-//user_esp_platform_dns_found(const char *name, ip_addr_t *ipaddr, void *arg)
-//{
-// struct espconn *pespconn = (struct espconn *)arg;
-// if (ipaddr != NULL)
-// {
-// os_printf("user_esp_platform_dns_found %d.%d.%d.%d/n",
-//		 *((uint8 *)&ipaddr->addr),
-//		 *((uint8 *)&ipaddr->addr + 1),
-//		 *((uint8 *)&ipaddr->addr + 2),
-//		 *((uint8 *)&ipaddr->addr + 3));
-// }
-// else
-// {
-//	 os_printf("Found DNS Failed!\n");
-// }
-//
-//}
-//struct espconn Dns_esp_conn;     //建立一个espconn结构体
-//ip_addr_t esp_server_ip;
+void ICACHE_FLASH_ATTR
+user_esp_platform_dns_found_ntp(const char *name, ip_addr_t *ipaddr, void *arg)
+{
+struct espconn *pespconn = (struct espconn *)arg;
+if (ipaddr != NULL)
+{
+os_printf("user_esp_platform_dns_found %d.%d.%d.%d/n",
+		 *((uint8 *)&ipaddr->addr),
+		 *((uint8 *)&ipaddr->addr + 1),
+		 *((uint8 *)&ipaddr->addr + 2),
+		 *((uint8 *)&ipaddr->addr + 3));
+
+		set_sntp_server_ip(ipaddr);
+}
+else
+{
+	 os_printf("Found DNS Failed!\n");
+}
+
+}
+struct espconn Dns_esp_conn_ntp;     //建立一个espconn结构体
+ip_addr_t esp_server_ip_ntp;
 void ICACHE_FLASH_ATTR Sntp_Config(char *Ntpsever,uint32 NtpipLen)
 {
 	uint8_t i,isDns = 0;
@@ -617,29 +620,28 @@ void ICACHE_FLASH_ATTR Sntp_Config(char *Ntpsever,uint32 NtpipLen)
 			break;
 		}
 	}
+	DNS_SERVER_DEBUG("ntpserver = %s", Ntpsever);
+
 	if(isDns == 1)
 	{
      DNS_SERVER_DEBUG("DNSSet\n");
-	 sntp_setservername(0, Ntpsever); // set server 0 by domain name
-	 //espconn_gethostbyname(&Dns_esp_conn,Ntpsever,&esp_server_ip,user_esp_platform_dns_found);
+	 espconn_gethostbyname(&Dns_esp_conn_ntp,Ntpsever,&esp_server_ip_ntp,user_esp_platform_dns_found_ntp);
 	}
 	else
-	{
-		 DNS_SERVER_DEBUG("NODNSSet\n");
-		//sntp_setservername(1, "ntp.sjtu.edu.cn"); // set server 1 by domain name
-		//ipaddr_aton("210.72.145.44", addr);
-		//ipaddr_aton("182.16.3.162", addr);
-		DNS_SERVER_DEBUG("NTPIP != DSN\n");
+	{		
 		ipaddr_aton(Ntpsever, addr);
-		sntp_setserver(2, addr); // set server 2 by IP address
+		set_sntp_server_ip(addr);
+		DNS_SERVER_DEBUG("NTPIP != DSN\n");
+
+		//sntp_setserver(0, addr); // set server 2 by IP address
 	}
-	sntp_init();
+
     os_free(addr);
     Spi_FlashRead(DST_Erase,ISSET_DST_ERASE_OFFSET,&IsDst,1);  //读取是否需要设置夏令时
 
-	os_timer_disarm(&sntp_timer);
-	os_timer_setfn(&sntp_timer, (os_timer_func_t *)user_check_sntp_stamp, NULL);
-	os_timer_arm(&sntp_timer, 1000, 1);
+	os_timer_disarm(&my_sntp_timer);
+	os_timer_setfn(&my_sntp_timer, (os_timer_func_t *)user_check_sntp_stamp, NULL);
+	os_timer_arm(&my_sntp_timer, 1000, 1);
 
 
 }

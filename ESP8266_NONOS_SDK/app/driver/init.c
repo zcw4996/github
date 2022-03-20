@@ -135,6 +135,7 @@ void ICACHE_FLASH_ATTR Get_APid_Link_AP()
 	Spi_FlashRead(AP_NUM_Erase,AP_NUM_ERASE_OFFSET,&APID,1);  //从FLASH中获取AP_ID
 	vLink_AP(APID);
 }
+
 void ICACHE_FLASH_ATTR vLink_AP(uint32 AP_ID)
 {
 	uint32 APNAME_len = 0,APPSWD_len = 0;

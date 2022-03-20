@@ -52,7 +52,6 @@ void ICACHE_FLASH_ATTR SetNtp()
 		   Ntpsever1[i] = (char)Ntpsever[i];
 		 }
 		 Ntpsever1[NtpIpLen] = '\0';
-		 sntp_stop();
 		 Sntp_Config(Ntpsever1,NtpIpLen);
 
 		 DNS_SERVER_DEBUG("sntp_get_timezone = %d\n", sntp_get_timezone());
@@ -258,7 +257,7 @@ void ICACHE_FLASH_ATTR user_check_ip(void)
 	       APP_TCPPort = 50000;
 		}
 		AP_tcpserverAPP_init(APP_TCPPort);
-		//AP_udpclient_init();                   /* UDP服务器初始化 */
+		AP_udpclient_init();                   /* UDP服务器初始化 */
 
     }
     else

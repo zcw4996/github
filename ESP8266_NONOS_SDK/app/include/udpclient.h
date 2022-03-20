@@ -1,7 +1,7 @@
 /*
  * udpclient.h
  *
- *  Created on: 2017Äê2ÔÂ10ÈÕ
+ *  Created on: 2017å¹´2æœˆ10æ—¥
  *      Author: dell
  */
 
@@ -52,4 +52,5 @@
 void ICACHE_FLASH_ATTR AP_udpclient_init(void);
 LOCAL void ICACHE_FLASH_ATTR udpcilent_recv_cb(void *arg, char *pusrdata, unsigned short length);
 void ICACHE_FLASH_ATTR client_send(void *arg);
+uint32_t get_current_stamp(void);
 #endif /* APP_INCLUDE_UDPCLIENT_H_ */

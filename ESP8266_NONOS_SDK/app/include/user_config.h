@@ -26,56 +26,56 @@
 #define __USER_CONFIG_H__
 #include "mem.h"
 
-#define Init_Erase  124  //���������ݼ�¼�Ƿ�Ҫ��λ����������
+#define Init_Erase  124  //此扇区数据记录是否要复位到出厂设置
 
-#define AP_NAME_PSWD_Erase   125  //���������ݼ�¼�ͻ����õ�AP���ƺ�����
-#define AP_NAME_ERASE_OFFSET   0 //������ƫ�Ƶ�ַ�����洢AP����
-#define AP_NAME_LEN_ERASE_OFFSET   240  //������ƫ�Ƶ�ַ�����洢AP���Ƴ���
-#define AP_PSWD_ERASE_OFFSET   148  //������ƫ�Ƶ�ַ�����洢AP����
-#define AP_PSWD_LEN_ERASE_OFFSET   280  //������ƫ�Ƶ�ַ�����洢AP���볤��
+#define AP_NAME_PSWD_Erase   125  //此扇区数据记录客户配置的AP名称和密码
+#define AP_NAME_ERASE_OFFSET   0 //此扇区偏移地址用来存储AP名称
+#define AP_NAME_LEN_ERASE_OFFSET   240  //此扇区偏移地址用来存储AP名称长度
+#define AP_PSWD_ERASE_OFFSET   148  //此扇区偏移地址用来存储AP密码
+#define AP_PSWD_LEN_ERASE_OFFSET   280  //此扇区偏移地址用来存储AP密码长度
 
-#define AP1_NAME_PSWD_Erase   131  //���������ݼ�¼�ͻ����õĵڶ���AP���ƺ�����
+#define AP1_NAME_PSWD_Erase   131  //此扇区数据记录客户配置的第二个AP名称和密码
 
-#define NO_APID 0   //��ʾ��δ����AP����
+#define NO_APID 0   //表示还未存入AP数据
 #define APID1   1
 #define APID2   2
 
-#define AP_NUM_Erase   132  //���������ݼ�¼�ͻ����õ�AP����
-#define AP_NUM_ERASE_OFFSET   0 //������ƫ�Ƶ�ַ�����洢AP����
+#define AP_NUM_Erase   132  //此扇区数据记录客户配置的AP个数
+#define AP_NUM_ERASE_OFFSET   0 //此扇区偏移地址用来存储AP个数
 
-#define AP_NUM_MAX       2     //����¼����AP����
+#define AP_NUM_MAX       2     //最大记录几个AP数据
 
 #define TIMEZONE_ERASE  123
-#define TIMEZONE_ERASE_OFFSET  0 //������ƫ�Ƶ�ַ�����洢ʱ��
+#define TIMEZONE_ERASE_OFFSET  0 //此扇区偏移地址用来存储时区
 
-#define TIME_Interva_ERASE  133  //���NTPʱ�����ݵ�ʱ����
+#define TIME_Interva_ERASE  133  //输出NTP时间数据的时间间隔
 #define TIME_Interva_ERASE_OFFSET  0
 
-#define LOCAL_Erase   126  //���������ݼ�¼�ͻ����õı���IP�����أ�����
-#define LOCAL_IP_ERASE_OFFSET   0 //������ƫ�Ƶ�ַ�����洢����IP��ַ
-#define LOCAL_Mask_ERASE_OFFSET   96     //������ƫ�Ƶ�ַ�����洢������������
-#define LOCAL_GATAWAY_ERASE_OFFSET   220     //������ƫ�Ƶ�ַ�����洢��������
+#define LOCAL_Erase   126  //此扇区数据记录客户配置的本地IP，网关，掩码
+#define LOCAL_IP_ERASE_OFFSET   0 //此扇区偏移地址用来存储本地IP地址
+#define LOCAL_Mask_ERASE_OFFSET   96     //此扇区偏移地址用来存储本地子网掩码
+#define LOCAL_GATAWAY_ERASE_OFFSET   220     //此扇区偏移地址用来存储本地网关
 
-#define FIRST_START_Erase   136  ///* ��������¼�Ƿ��һ�������豸 */
+#define FIRST_START_Erase   136  ///* 此扇区记录是否第一次启动设备 */
 #define FIRST_START_ERASE_OFFSET   0 //
 
-#define IS_AUTO_WEB_Erase   137  ///* ��������¼���Ƿ��Զ�������ҳ */
+#define IS_AUTO_WEB_Erase   137  ///* 此扇区记录是是否自动弹出网页 */
 #define IS_AUTO_WEB_ERASE_OFFSET   0 //
 
-#define TCP_PORT_Erase   138  ///* ��������¼TCP�������˿ں�  */
+#define TCP_PORT_Erase   138  ///* 此扇区记录TCP服务器端口号  */
 #define TCP_PORT_ERASE_OFFSET   0 //
 
-#define TCP_SERVERIP_Erase   139            ///* ��������¼TCP�ͻ��˲���  */
-#define TCP_SERVERIP_ERASE_OFFSET   0       ///* ��������¼TCP�ͻ���IP������  */
-#define TCP_SERVERIPLen_ERASE_OFFSET   96    ///* ��������¼TCP�ͻ���IP����������  */
-#define TCP_SERVER_PORT_ERASE_OFFSET   120   ///* ��������¼TCP�ͻ���IP�������Ķ˿�  */
-#define TCP_SERVER_TPYE_ERASE_OFFSET   220   ///* ��������¼TCP���ͣ������ӻ��Ƕ�����  */
+#define TCP_SERVERIP_Erase   139            ///* 此扇区记录TCP客户端参数  */
+#define TCP_SERVERIP_ERASE_OFFSET   0       ///* 此扇区记录TCP客户端IP或域名  */
+#define TCP_SERVERIPLen_ERASE_OFFSET   96    ///* 此扇区记录TCP客户端IP或域名长度  */
+#define TCP_SERVER_PORT_ERASE_OFFSET   120   ///* 此扇区记录TCP客户端IP或域名的端口  */
+#define TCP_SERVER_TPYE_ERASE_OFFSET   220   ///* 此扇区记录TCP类型，长连接还是短连接  */
 
-#define LANGUAGE_Erase   122            ///* ��������¼���԰汾����  */
-#define LANGUAGE_ERASE_OFFSET   0       ///* ��������¼���԰汾����  */
+#define LANGUAGE_Erase   122            ///* 此扇区记录语言版本参数  */
+#define LANGUAGE_ERASE_OFFSET   0       ///* 此扇区记录语言版本参数  */
 
-#define LANGUAGE_EN     0x5a            /*Ӣ��汾*/
-#define LANGUAGE_CH     0xa5            /*���İ汾*/
+#define LANGUAGE_EN     0x5a            /*英语版本*/
+#define LANGUAGE_CH     0xa5            /*中文版本*/
 
 #define NO_DHCP_Erase   135  //
 #define NO_DHCP_IP_ERASE_OFFSET   0 //
@@ -83,16 +83,16 @@
 #define NO_DHCP_GATAWAY_ERASE_OFFSET   220     //
 #define DHCP_OPEN_ERASE_OFFSET   320     //
 
-#define LOCALSSID_Erase   134  //���������ݼ�¼�ͻ����õ�SSID ����
-#define SSID_ERASE_OFFSET   300  //������ƫ�Ƶ�ַ�����洢SSID����
-#define SSID_Len_ERASE_OFFSET   444  //������ƫ�Ƶ�ַ�����洢SSID���ݳ���
-#define PSWD_ERASE_OFFSET   400  //������ƫ�Ƶ�ַ�����洢��������
-#define PSWD_LEN_ERASE_OFFSET   440  //������ƫ�Ƶ�ַ�����洢���볤��
+#define LOCALSSID_Erase   134  //此扇区数据记录客户配置的SSID 密码
+#define SSID_ERASE_OFFSET   300  //此扇区偏移地址用来存储SSID数据
+#define SSID_Len_ERASE_OFFSET   444  //此扇区偏移地址用来存储SSID数据长度
+#define PSWD_ERASE_OFFSET   400  //此扇区偏移地址用来存储密码数据
+#define PSWD_LEN_ERASE_OFFSET   440  //此扇区偏移地址用来存储密码长度
 
 
-#define NTP_IP_Erase   127  //���������ݼ�¼�ͻ����õ�NTP ip
-#define NTP_IP_ERASE_OFFSET   0 //������ƫ�Ƶ�ַ�����洢NTP ip
-#define NTP_IP_LEN_ERASE_OFFSET   220     //������ƫ�Ƶ�ַ����NTP IP�ĳ���
+#define NTP_IP_Erase   127  //此扇区数据记录客户配置的NTP ip
+#define NTP_IP_ERASE_OFFSET   0 //此扇区偏移地址用来存储NTP ip
+#define NTP_IP_LEN_ERASE_OFFSET   220     //此扇区偏移地址用来NTP IP的长度
 
 #define DST_SET    0x5a
 #define DST_NO_SET 0Xa5
@@ -103,36 +103,36 @@
 #define AUTO_ACCESS_WEB     '1'
 #define NO_AUTO_ACCESS_WEB  '2'
 
-#define DST_Erase   128  //���������ݼ�¼�ͻ����õ�����ʱ
-#define ISSET_DST_ERASE_OFFSET   0    //������ƫ�Ƶ�ַ������¼�Ƿ�Ҫ��������ʱ
-#define DSTSTART_HOUR_ERASE_OFFSET   32 //������ƫ�Ƶ�ַ��������ʱ��ʼСʱ
-#define DSTSTART_SELE_WEEK_ERASE_OFFSET   64    /*������ƫ�Ƶ�ַ�����洢����ʱ����ѡ�� */
-#define DSTSTART_WEEK_ERASE_OFFSET 96      /* ������ƫ�Ƶ�ַ�����洢����ʱ���� */
-#define DSTSTART_MON_ERASE_OFFSET  128      /* ������ƫ�Ƶ�ַ�����洢����ʱ�·� */
+#define DST_Erase   128  //此扇区数据记录客户配置的夏令时
+#define ISSET_DST_ERASE_OFFSET   0    //此扇区偏移地址用来记录是否要设置夏令时
+#define DSTSTART_HOUR_ERASE_OFFSET   32 //此扇区偏移地址用来夏令时起始小时
+#define DSTSTART_SELE_WEEK_ERASE_OFFSET   64    /*此扇区偏移地址用来存储夏令时星期选择 */
+#define DSTSTART_WEEK_ERASE_OFFSET 96      /* 此扇区偏移地址用来存储夏令时星期 */
+#define DSTSTART_MON_ERASE_OFFSET  128      /* 此扇区偏移地址用来存储夏令时月份 */
 
-#define DSTEND_HOUR_ERASE_OFFSET   160 //������ƫ�Ƶ�ַ��������ʱ����Сʱ
-#define DSTEND_SELE_WEEK_ERASE_OFFSET   192    /*������ƫ�Ƶ�ַ�����洢����ʱ����ѡ�� */
-#define DSTEND_WEEK_ERASE_OFFSET 224      /* ������ƫ�Ƶ�ַ�����洢����ʱ���� */
-#define DSTEND_MON_ERASE_OFFSET  256      /* ������ƫ�Ƶ�ַ�����洢����ʱ�·� */
+#define DSTEND_HOUR_ERASE_OFFSET   160 //此扇区偏移地址用来夏令时结束小时
+#define DSTEND_SELE_WEEK_ERASE_OFFSET   192    /*此扇区偏移地址用来存储夏令时星期选择 */
+#define DSTEND_WEEK_ERASE_OFFSET 224      /* 此扇区偏移地址用来存储夏令时星期 */
+#define DSTEND_MON_ERASE_OFFSET  256      /* 此扇区偏移地址用来存储夏令时月份 */
 
 #define DST_STRAT  0X5a
 #define DST_FINISH 0Xa5
 #define DST_TIMEOUT_Erase   129
-#define DST_TIMEOUT_ERASE_OFFSET   0      //������ƫ�Ƶ�ַ������¼����ʱ�Ƿ�ʼ
+#define DST_TIMEOUT_ERASE_OFFSET   0      //此扇区偏移地址用来记录夏令时是否开始
 
 #define NTP_MODE    0x5a
 #define APP_MODE    0XA5
 
 #define NTPAPP_Erase   130
-#define NTPAPP_ERASE_OFFSET   0      //������ƫ�Ƶ�ַ������¼��NTPģʽ����APPģʽ
+#define NTPAPP_ERASE_OFFSET   0      //此扇区偏移地址用来记录是NTP模式还是APP模式
 
-#define SEVER1_FLASH_Erase 530    //��ҳ1�Ĵ洢��ַ
-#define SEVER2_FLASH_Erase 525    //��ҳ2�Ĵ洢��ַ
-#define SEVER3_FLASH_Erase 510    //��ҳ3�Ĵ洢��ַ
-#define SEVER4_FLASH_Erase 515    //��ҳ4�Ĵ洢��ַ
-#define SEVER5_FLASH_Erase 520    //��ҳ5�Ĵ洢��ַ
-#define INIT_SET    0x5a    //������Ҫ��λ��������
-#define INIT_NO_SET 0xa5    //��������Ҫ��λ����������
+#define SEVER1_FLASH_Erase 530    //网页1的存储地址
+#define SEVER2_FLASH_Erase 525    //网页2的存储地址
+#define SEVER3_FLASH_Erase 510    //网页3的存储地址
+#define SEVER4_FLASH_Erase 515    //网页4的存储地址
+#define SEVER5_FLASH_Erase 520    //网页5的存储地址
+#define INIT_SET    0x5a    //代表需要复位出厂设置
+#define INIT_NO_SET 0xa5    //代表不需要复位到出厂设置
 
 #define APPLINK   0x5a
 #define NOAPPLINK 0xa5

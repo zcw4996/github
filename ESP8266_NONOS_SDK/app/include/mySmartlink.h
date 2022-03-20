@@ -1,7 +1,7 @@
 /*
  * mySmartlink.h
  *
- *  Created on: 2017Äê2ÔÂ8ÈÕ
+ *  Created on: 2017å¹´2æœˆ8æ—¥
  *      Author: dell
  */
 
@@ -12,11 +12,12 @@
 #include "osapi.h"
 #include "user_interface.h"
 #include "smartconfig.h"
-//extern struct espconn Dns_esp_conn;     //½¨Á¢Ò»¸öespconn½á¹¹Ìå
+//extern struct espconn Dns_esp_conn;     //å»ºç«‹ä¸€ä¸ªespconnç»“æž„ä½“
 //extern ip_addr_t esp_server_ip;
 extern uint8 AlreadStartPutTime;
 void ICACHE_FLASH_ATTR smartconfig_done(sc_status status, void *pdata);
 void ICACHE_FLASH_ATTR smartconfig_led(void);
 unsigned char ICACHE_FLASH_ATTR Get_Week(unsigned int Year,unsigned char Month,unsigned char Date);
 void ICACHE_FLASH_ATTR user_esp_platform_dns_found(const char *name, ip_addr_t *ipaddr, void *arg);
+void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg);
 #endif /* APP_INCLUDE_MYSMARTLINK_H_ */
