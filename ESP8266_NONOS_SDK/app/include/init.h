@@ -11,7 +11,7 @@
 #include "osapi.h"
 #include "user_interface.h"
 
-#define GLOBAL_DEBUG
+//#define GLOBAL_DEBUG
  
 #if defined(GLOBAL_DEBUG)
 #define DNS_SERVER_DEBUG(format, ...) os_printf("[%s:%d]" format "", __FILE__,__LINE__,##__VA_ARGS__)
