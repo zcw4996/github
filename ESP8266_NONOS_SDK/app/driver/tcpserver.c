@@ -33,6 +33,9 @@ char HttpHead[200];
  extern uint32 IsDst;
 extern  uint8_t isLedClose;
 extern uint32 SysTime_ms;
+extern os_timer_t send_timer; 
+
+void ICACHE_FLASH_ATTR client_send(void *arg);
 /*-------------------------------------------------------------*/
 /*函数功能：TCP服务器初始化函数                                                                       */
 /*参       数：port：本地端口号                                                                            */
@@ -1795,15 +1798,16 @@ void ICACHE_FLASH_ATTR ChangeTimeOutInterva(char *TimeIntervaPoing,uint32 TimeIn
 	}
 	spi_flash_erase_sector (TIME_Interva_ERASE);  //
 	spi_flash_write (TIME_Interva_ERASE*4*1024 + TIME_Interva_ERASE_OFFSET, &TimeOutInterva, 1 * 4);
+
 	if(TimeOutInterva >= 1 && TimeOutInterva <= 9999)
 	{
-	 os_timer_disarm(&sntpPutTime);
-	 os_timer_setfn(&sntpPutTime, (os_timer_func_t *)PutSntpTime, NULL);
-	 os_timer_arm(&sntpPutTime, TimeOutInterva * 1000, 1);
+		os_timer_disarm(&send_timer);
+		os_timer_setfn(&send_timer, (os_timer_func_t *)client_send, NULL);          //注册定时器的回调函数
+		os_timer_arm(&send_timer, TimeOutInterva * 1000, 0);  
 	}
-	if(TimeOutInterva == 0)
+	else if(TimeOutInterva == 0)
 	{
-		 os_timer_disarm(&sntpPutTime);
+		os_timer_disarm(&send_timer);
 	}
 }
 void ICACHE_FLASH_ATTR SetAutoWeb(char *Point)

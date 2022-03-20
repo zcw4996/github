@@ -16,7 +16,7 @@ LOCAL os_timer_t current_stamp_timer;  //此定时器用以累加时间
 char esp_udp_server_ip[4] = {118,24,4,66};     // 服务器IP       根据实际情况修改
 #define SERVRT_PORT    123                              // 服务器端口号        根据实际情况修改
 
-LOCAL os_timer_t send_timer;  //定义一个定时器结构
+os_timer_t send_timer;  //定义一个定时器结构
 
 void set_sntp_server_ip(ip_addr_t *ipaddr)
 {
@@ -87,13 +87,12 @@ LOCAL void ICACHE_FLASH_ATTR udpcilent_recv_cb(void *arg, char *pusrdata, unsign
 	DNS_SERVER_DEBUG("udp rece len = %d\r\n", length);                         //打印收到的数据
 	current_stamp = (uint32_t) (((uint8_t)pusrdata[40] << 24) | ((uint8_t)pusrdata[41] << 16) |( (uint8_t)pusrdata[42] << 8) | ((uint8_t)pusrdata[43] << 0)) ;
 	current_stamp = current_stamp - DIFF_SEC_1900_1970;
+    user_check_sntp_stamp(NULL);
+	PutSntpTime();
 
-    os_timer_disarm(&current_stamp_timer);
-    os_timer_setfn(&current_stamp_timer, (os_timer_func_t *)set_current_stamp, NULL);      //注册定时器的回调函数
-    os_timer_arm(&current_stamp_timer, 1000, 1);
 }
 
-
+extern uint32_t TimeOutInterva;
 /*-------------------------------------------------------------*/
 /*函数功能：定时发送                                                                                           */
 /*参       数：无                                                                                                      */
@@ -107,18 +106,25 @@ void ICACHE_FLASH_ATTR client_send(void *arg)
 	udpclient_esp_conn.proto.udp->remote_port = SERVRT_PORT;                    //拷贝服务器端口号
 	espconn_sent(&udpclient_esp_conn, NtpSendData, 48);                      //发送数据
 	
-
-	os_timer_disarm(&send_timer);
-    os_timer_setfn(&send_timer, (os_timer_func_t *)client_send, NULL);          //注册定时器的回调函数
-
-	if(AlreadStartPutTime == 1) //若已经同步了时间，则10s获取一次ntp数据
+	Spi_FlashRead(TIME_Interva_ERASE,TIME_Interva_ERASE_OFFSET,&TimeOutInterva,1);  // 设置定时发送 
+	if(TimeOutInterva >= 1 && TimeOutInterva <= 9999)
 	{
-		os_timer_arm(&send_timer, 10000, 0);                                         //10s定时，非自动模式	
+		os_timer_disarm(&send_timer);
+		os_timer_setfn(&send_timer, (os_timer_func_t *)client_send, NULL);          //注册定时器的回调函数
+		os_timer_arm(&send_timer, TimeOutInterva * 1000, 0);  
 	}
-	else
+	else if(TimeOutInterva == 0)
 	{
-   		os_timer_arm(&send_timer, 1000, 0);                                         //1s定时，非自动模式	 	
+		os_timer_disarm(&send_timer);
 	}
+           
+	if(AlreadStartPutTime == 0)                      //如果开机后 未同步过时间，则1秒获取一次sntp时间
+	{
+		os_timer_disarm(&send_timer);
+		os_timer_setfn(&send_timer, (os_timer_func_t *)client_send, NULL);          //注册定时器的回调函数
+		os_timer_arm(&send_timer, 1000, 0);  	
+	}
+
 
 }
 

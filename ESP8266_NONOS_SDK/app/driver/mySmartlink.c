@@ -483,8 +483,8 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
      }
 
     DealwithNtpStr(NTP_time,&Ntp_Data1); /* 对字符串时间数据做处理，存储到结构体中 */
-	 if(IsDst == DST_SET)
-	 {            //取出要设置的夏令时数据
+	if(IsDst == DST_SET)
+	{            //取出要设置的夏令时数据
 		Spi_FlashRead(DST_Erase,DSTSTART_HOUR_ERASE_OFFSET,&DstStart.Dst_Hour,1);
 		Spi_FlashRead(DST_Erase,DSTSTART_SELE_WEEK_ERASE_OFFSET,&DstStart.Dst_WeekSel,1);
 		Spi_FlashRead(DST_Erase,DSTSTART_WEEK_ERASE_OFFSET,&DstStart.Dst_Week,1);
@@ -495,69 +495,25 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
 		Spi_FlashRead(DST_Erase,DSTEND_WEEK_ERASE_OFFSET,&DstEnd.Dst_Week,1);
 		Spi_FlashRead(DST_Erase,DSTEND_MON_ERASE_OFFSET,&DstEnd.Dst_Mon,1);
 
-		 SetDst(&DstStart,&DstEnd,&Ntp_Data1);
+		SetDst(&DstStart,&DstEnd,&Ntp_Data1);
 
-	 }
-	 if(Ntp_Data1.Dst_year < 2019) /* 代表未从NTP服务器获取到相应的时间报文，则重新获取 */
-	 {
-		 AlreadStartPutTime = 0;
-		 LinkAPstate = 0;
-		 os_timer_disarm(&my_sntp_timer);
-		 os_timer_disarm(&sntpPutTime);
-	 }
-	 else
-	 {
-		 if(AlreadStartPutTime == 1)
-		 {
+	}
 
-		 }
-		 else
-		 {
-			 PackSend[3] = (uint8_t)((Ntp_Data1.Dst_year / 10 % 10) + 0x30);
-			 PackSend[4] = (uint8_t)((Ntp_Data1.Dst_year / 1 % 10) + 0x30);
-			 PackSend[5] = (uint8_t)(Ntp_Data1.Dst_month / 10 + 0x30);
-			 PackSend[6] = (uint8_t)(Ntp_Data1.Dst_month % 10 + 0x30);
-			 PackSend[7] = (uint8_t)(Ntp_Data1.Dst_day / 10 + 0x30);
-			 PackSend[8] = (uint8_t)(Ntp_Data1.Dst_day % 10 + 0x30);
-			 PackSend[9] = (uint8_t)(Ntp_Data1.Dst_hour / 10 + 0x30);
-			 PackSend[10] = (uint8_t)(Ntp_Data1.Dst_hour % 10 + 0x30);
-			 PackSend[11] = (uint8_t)(Ntp_Data1.Dst_min / 10 + 0x30);
-			 PackSend[12] = (uint8_t)(Ntp_Data1.Dst_min % 10 + 0x30);
-			 PackSend[13] = (uint8_t)(Ntp_Data1.Dst_sec / 10 + 0x30);
-			 PackSend[14] = (uint8_t)(Ntp_Data1.Dst_sec % 10 + 0x30);
-			 PackSend[15] = (uint8_t)(Ntp_Data1. Dst_week + 0x30);
-			 PutSntpTime();
-			 AlreadStartPutTime = 1;
-			 Spi_FlashRead(TIME_Interva_ERASE,TIME_Interva_ERASE_OFFSET,&TimeOutInterva,1);
-			 if(TimeOutInterva >= 1 && TimeOutInterva <= 9999)
-			 {
-				 os_timer_disarm(&sntpPutTime);
-				 os_timer_setfn(&sntpPutTime, (os_timer_func_t *)PutSntpTime, NULL);
-				 os_timer_arm(&sntpPutTime, TimeOutInterva * 1000, 1);
-			 }
-			 if(TimeOutInterva == 0)
-			 {
-				 os_timer_disarm(&sntpPutTime);
-			 }
+	PackSend[3] = (uint8_t)((Ntp_Data1.Dst_year / 10 % 10) + 0x30);
+	PackSend[4] = (uint8_t)((Ntp_Data1.Dst_year / 1 % 10) + 0x30);
+	PackSend[5] = (uint8_t)(Ntp_Data1.Dst_month / 10 + 0x30);
+	PackSend[6] = (uint8_t)(Ntp_Data1.Dst_month % 10 + 0x30);
+	PackSend[7] = (uint8_t)(Ntp_Data1.Dst_day / 10 + 0x30);
+	PackSend[8] = (uint8_t)(Ntp_Data1.Dst_day % 10 + 0x30);
+	PackSend[9] = (uint8_t)(Ntp_Data1.Dst_hour / 10 + 0x30);
+	PackSend[10] = (uint8_t)(Ntp_Data1.Dst_hour % 10 + 0x30);
+	PackSend[11] = (uint8_t)(Ntp_Data1.Dst_min / 10 + 0x30);
+	PackSend[12] = (uint8_t)(Ntp_Data1.Dst_min % 10 + 0x30);
+	PackSend[13] = (uint8_t)(Ntp_Data1.Dst_sec / 10 + 0x30);
+	PackSend[14] = (uint8_t)(Ntp_Data1.Dst_sec % 10 + 0x30);
+	PackSend[15] = (uint8_t)(Ntp_Data1. Dst_week + 0x30);
 
-
-		 }
-	 }
-
-
-	 PackSend[3] = (uint8_t)((Ntp_Data1.Dst_year / 10 % 10) + 0x30);
-	 PackSend[4] = (uint8_t)((Ntp_Data1.Dst_year / 1 % 10) + 0x30);
-	 PackSend[5] = (uint8_t)(Ntp_Data1.Dst_month / 10 + 0x30);
-	 PackSend[6] = (uint8_t)(Ntp_Data1.Dst_month % 10 + 0x30);
-	 PackSend[7] = (uint8_t)(Ntp_Data1.Dst_day / 10 + 0x30);
-	 PackSend[8] = (uint8_t)(Ntp_Data1.Dst_day % 10 + 0x30);
-	 PackSend[9] = (uint8_t)(Ntp_Data1.Dst_hour / 10 + 0x30);
-	 PackSend[10] = (uint8_t)(Ntp_Data1.Dst_hour % 10 + 0x30);
-	 PackSend[11] = (uint8_t)(Ntp_Data1.Dst_min / 10 + 0x30);
-	 PackSend[12] = (uint8_t)(Ntp_Data1.Dst_min % 10 + 0x30);
-	 PackSend[13] = (uint8_t)(Ntp_Data1.Dst_sec / 10 + 0x30);
-	 PackSend[14] = (uint8_t)(Ntp_Data1.Dst_sec % 10 + 0x30);
-	 PackSend[15] = (uint8_t)(Ntp_Data1. Dst_week + 0x30);
+	AlreadStartPutTime = 1;
 
 	DNS_SERVER_DEBUG("sntp: %d, %s \n",current_stamp,	NTP_time);
 
@@ -638,11 +594,6 @@ void ICACHE_FLASH_ATTR Sntp_Config(char *Ntpsever,uint32 NtpipLen)
 
     os_free(addr);
     Spi_FlashRead(DST_Erase,ISSET_DST_ERASE_OFFSET,&IsDst,1);  //读取是否需要设置夏令时
-
-	os_timer_disarm(&my_sntp_timer);
-	os_timer_setfn(&my_sntp_timer, (os_timer_func_t *)user_check_sntp_stamp, NULL);
-	os_timer_arm(&my_sntp_timer, 1000, 1);
-
 
 }
 ///*-------------------------------------------------------------*/
