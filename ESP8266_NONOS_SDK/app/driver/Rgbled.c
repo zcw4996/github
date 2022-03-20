@@ -18,33 +18,33 @@ void ICACHE_FLASH_ATTR LedBlue(uint8_t State)
 {
 	if(State == 1)
 	{
-		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//GPIO14为高
+		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//GPIO14涓洪珮
 	}
 	else
 	{
-		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//GPIO14为高
+		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//GPIO14涓洪珮
 	}
 }
 void ICACHE_FLASH_ATTR LedGreen(uint8_t State)
 {
 	if(State == 1)
 	{
-		GPIO_OUTPUT_SET(GPIO_ID_PIN(4), 0);//GPIO14为高
+		GPIO_OUTPUT_SET(GPIO_ID_PIN(4), 0);//GPIO14涓洪珮
 	}
 	else
 	{
-		GPIO_OUTPUT_SET(GPIO_ID_PIN(4), 1);//GPIO14为高
+		GPIO_OUTPUT_SET(GPIO_ID_PIN(4), 1);//GPIO14涓洪珮
 	}
 }
 void ICACHE_FLASH_ATTR LedRed(uint8_t State)
 {
 	if(State == 1)
 	{
-		GPIO_OUTPUT_SET(GPIO_ID_PIN(5), 0);//GPIO14为高
+		GPIO_OUTPUT_SET(GPIO_ID_PIN(5), 0);//GPIO14涓洪珮
 	}
 	else
 	{
-		GPIO_OUTPUT_SET(GPIO_ID_PIN(5), 1);//GPIO14为高
+		GPIO_OUTPUT_SET(GPIO_ID_PIN(5), 1);//GPIO14涓洪珮
 	}
 }
 void ICACHE_FLASH_ATTR LedCloseALL(void)
