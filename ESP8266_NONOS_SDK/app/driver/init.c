@@ -269,9 +269,9 @@ void ICACHE_FLASH_ATTR RecoveryData()
 	DefaultData.IsSetDST = DST_NO_SET;
 	DefaultData.TcpServerIP_Len = 0;
 	DefaultData.Language_state = LANGUAGE_EN;
-	DefaultData.IP[0] = 192;  DefaultData.IP[1] =168;DefaultData.IP[2] =1;DefaultData.IP[3] =100;
+	DefaultData.IP[0] = 192;  DefaultData.IP[1] =168;DefaultData.IP[2] =75;DefaultData.IP[3] =100;
 
-	DefaultData.gw[0] = 192; DefaultData.gw[1] =168;DefaultData.gw[2] =1;DefaultData.gw[3] =100;
+	DefaultData.gw[0] = 192; DefaultData.gw[1] =168;DefaultData.gw[2] =75;DefaultData.gw[3] =100;
 
 	DefaultData.netmask[0] = 255;DefaultData.netmask[1] = 255;DefaultData.netmask[2] = 255;DefaultData.netmask[3] = 0;
 
