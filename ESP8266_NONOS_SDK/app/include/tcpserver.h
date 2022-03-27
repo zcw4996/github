@@ -1,7 +1,7 @@
 /*
  * tcpserver.h
  *
- *  Created on: 2017Äê2ÔÂ8ÈÕ
+ *  Created on: 2017å¹´2æœˆ8æ—¥
  *      Author: dell
  */
 
@@ -440,11 +440,11 @@ typedef struct{
 
 #define  TCPPCBSIZE  10
 typedef struct {
-	uint8_t TcpClientCount;  /* ´Ë±äÁ¿ÓÃÀ´´æ´¢µ±Ç°ÓĞ¼¸¸ö¿Í»§¶ËÁ¬½Ó */
-	//uint8_t TcpClientWritePoint; /* Ğ´Ö¸Õë */
+	uint8_t TcpClientCount;  /* æ­¤å˜é‡ç”¨æ¥å­˜å‚¨å½“å‰æœ‰å‡ ä¸ªå®¢æˆ·ç«¯è¿æ¥ */
+	//uint8_t TcpClientWritePoint; /* å†™æŒ‡é’ˆ */
 	//struct espconn *EspConnBuffer[10];
 }TcpServerPacket;
-extern struct espconn Dns_Client_conn;     //½¨Á¢Ò»¸öespconn½á¹¹Ìå
+extern struct espconn Dns_Client_conn;     //å»ºç«‹ä¸€ä¸ªespconnç»“æ„ä½“
 extern ip_addr_t esp_server_ip;
 extern char tempSaveData[];
 extern char DnsBuffer[];

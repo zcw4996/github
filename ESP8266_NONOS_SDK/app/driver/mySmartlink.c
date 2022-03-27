@@ -499,6 +499,8 @@ void ICACHE_FLASH_ATTR user_check_sntp_stamp(void *arg)
 
 	}
 
+	Ntp_Data1.Dst_sec ++;// 为了时间同步 精确到毫秒，对秒数+1，等到了整秒后，再发数据
+
 	PackSend[3] = (uint8_t)((Ntp_Data1.Dst_year / 10 % 10) + 0x30);
 	PackSend[4] = (uint8_t)((Ntp_Data1.Dst_year / 1 % 10) + 0x30);
 	PackSend[5] = (uint8_t)(Ntp_Data1.Dst_month / 10 + 0x30);

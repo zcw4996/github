@@ -59,10 +59,11 @@ void ICACHE_FLASH_ATTR AP_udpclient_init(void)
     os_timer_setfn(&send_timer, (os_timer_func_t *)client_send, NULL);      //注册定时器的回调函数
     os_timer_arm(&send_timer, 1000, 0);                                                   //1s定时，非自动模式
 }
+extern os_timer_t sntpPutTime;
 /* number of seconds between 1900 and 1970 */
 #define DIFF_SEC_1900_1970         (2208988800UL)
 uint32_t  current_stamp = 0;
-
+uint32_t  current_ms = 0;  // 记录当前的毫秒数
 uint32_t get_current_stamp(void)
 {
 	return current_stamp;
@@ -84,11 +85,20 @@ LOCAL void ICACHE_FLASH_ATTR udpcilent_recv_cb(void *arg, char *pusrdata, unsign
     struct espconn *pesp_conn = arg;
 	remot_info *premot = NULL;
 
-	DNS_SERVER_DEBUG("udp rece len = %d\r\n", length);                         //打印收到的数据
+	DNS_SERVER_DEBUG("udp rece len = %d\r\n", length);      
+	                   //打印收到的数据    前32bits表示1900年以来的秒数。后32bits用以表示秒以下的部份，是微秒数的4294.967296(=2^32/10^6)倍。
 	current_stamp = (uint32_t) (((uint8_t)pusrdata[40] << 24) | ((uint8_t)pusrdata[41] << 16) |( (uint8_t)pusrdata[42] << 8) | ((uint8_t)pusrdata[43] << 0)) ;
 	current_stamp = current_stamp - DIFF_SEC_1900_1970;
+
+	current_ms = (uint32_t) (((uint8_t)pusrdata[44] << 24) | ((uint8_t)pusrdata[45] << 16) |( (uint8_t)pusrdata[46] << 8) | ((uint8_t)pusrdata[47] << 0)) ;
+	current_ms = current_ms/4295/1000;
+
     user_check_sntp_stamp(NULL);
-	PutSntpTime();
+
+	//为了让时间精确到毫秒，收到数据后，等到整秒后，再发数据
+	os_timer_disarm(&sntpPutTime);
+	os_timer_setfn(&sntpPutTime, (os_timer_func_t *)PutSntpTime, NULL);
+	os_timer_arm(&sntpPutTime, (uint32_t)(1000-current_ms), 0);
 
 }
 

@@ -191,7 +191,7 @@ STATUS uart_tx_one_char(uint8 uart, uint8 TxChar);
 STATUS uart_tx_one_char_no_wait(uint8 uart, uint8 TxChar);
 void  uart1_sendStr_no_wait(const char *str);
 struct UartBuffer*  Uart_Buf_Init();
-extern uint8 UART0_RX_BUFF[],data_len;        //串口0接收数据数组
+extern uint8 UART0_RX_BUFF[],data_len;        //涓插彛0鎺ユ敹鏁版嵁鏁扮粍
 
 #if UART_BUFF_EN
 LOCAL void  Uart_Buf_Cpy(struct UartBuffer* pCur, char* pdata , uint16 data_len);
