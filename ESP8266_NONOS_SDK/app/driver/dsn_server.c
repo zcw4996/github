@@ -129,9 +129,8 @@ void  dns_server_recv(void *arg, char *pusrdata, unsigned short len)
 
     client_esp_conn->proto.udp->remote_port =  pcon_info->remote_port;
 
-	//os_printf("remote ip: %d.%d.%d.%d \r\n",pcon_info->remote_ip[0],pcon_info->remote_ip[1],
-	//		                                    pcon_info->remote_ip[2],pcon_info->remote_ip[3]);
-	//os_printf("remote port: %d \r\n",pcon_info->remote_port);
+	//DNS_SERVER_DEBUG("remote ip: %d.%d.%d.%d \r\n",pcon_info->remote_ip[0],pcon_info->remote_ip[1], pcon_info->remote_ip[2],pcon_info->remote_ip[3]);
+	//DNS_SERVER_DEBUG("remote port: %d \r\n",pcon_info->remote_port);
 
     dns_buf[2] |= 0x80;
     dns_buf[3] |= 0x80;
@@ -152,11 +151,11 @@ void  dns_server_recv(void *arg, char *pusrdata, unsigned short len)
 
     dns_buf[len++] =0x00;
     dns_buf[len++] =0x04;
-	Spi_FlashRead(LOCAL_Erase,LOCAL_IP_ERASE_OFFSET,IP_addr,4);  //濞寸姴绌砽ash濞戞搩鍙€椤曚即宕ｉ弽銊︽嫳闁革妇妾篜 缂傚啯鍨甸崣锟� 閻庢稒鍔楃紞澶愬箳閳哄啰鍨�
-    dns_buf[len++] = (char)IP_addr[0];
-    dns_buf[len++] = (char)IP_addr[1];
-    dns_buf[len++] = (char)IP_addr[2];
-    dns_buf[len++] = (char)IP_addr[3];
+
+    dns_buf[len++] = DEFAULT_AP_IP1;
+    dns_buf[len++] = DEFAULT_AP_IP2;
+    dns_buf[len++] = DEFAULT_AP_IP3;
+    dns_buf[len++] = DEFAULT_AP_IP4;
 
     espconn_send(client_esp_conn, dns_buf, len);
 

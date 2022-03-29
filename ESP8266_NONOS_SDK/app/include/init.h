@@ -11,6 +11,39 @@
 #include "osapi.h"
 #include "user_interface.h"
 
+//STATION模式的默认IP网关
+#define DEFAULT_STATION_IP1 192
+#define DEFAULT_STATION_IP2 168
+#define DEFAULT_STATION_IP3 1
+#define DEFAULT_STATION_IP4 100
+
+#define DEFAULT_STATION_GW1 192
+#define DEFAULT_STATION_GW2 168
+#define DEFAULT_STATION_GW3 1
+#define DEFAULT_STATION_GW4 100
+
+#define DEFAULT_STATION_NETMASK1 255
+#define DEFAULT_STATION_NETMASK2 255
+#define DEFAULT_STATION_NETMASK3 255
+#define DEFAULT_STATION_NETMASK4 0
+
+
+//AP模式的默认IP网关
+#define DEFAULT_AP_IP1 192
+#define DEFAULT_AP_IP2 168
+#define DEFAULT_AP_IP3 75
+#define DEFAULT_AP_IP4 100
+
+#define DEFAULT_AP_GW1 192
+#define DEFAULT_AP_GW2 168
+#define DEFAULT_AP_GW3 75
+#define DEFAULT_AP_GW4 100
+
+#define DEFAULT_AP_NETMASK1 255
+#define DEFAULT_AP_NETMASK2 255
+#define DEFAULT_AP_NETMASK3 255
+#define DEFAULT_AP_NETMASK4 0
+
 //#define GLOBAL_DEBUG
  
 #if defined(GLOBAL_DEBUG)
@@ -28,6 +61,5 @@ void ICACHE_FLASH_ATTR Get_APid_Link_AP();
 void ICACHE_FLASH_ATTR vLink_AP(uint32 AP_ID);
 void ICACHE_FLASH_ATTR vGetStaticIP(uint8 mode);
 void ICACHE_FLASH_ATTR RecoveryData();
-void ICACHE_FLASH_ATTR ConfigEsp82662(struct ip_info *info1,uint8 opmode);
 void ICACHE_FLASH_ATTR ConfigEsp82663(struct ip_info *info1);
 #endif /* APP_INCLUDE_INIT_H_ */

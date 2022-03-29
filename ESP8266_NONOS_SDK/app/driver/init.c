@@ -80,26 +80,7 @@ void ICACHE_FLASH_ATTR ConfigEsp8266(char *SSID,char *PSWD,uint16 SSIDlen,uint16
 
 }
 
-void ICACHE_FLASH_ATTR ConfigEsp82662(struct ip_info *info1,uint8 opmode)
-{
-	//wifi_set_opmode(STATIONAP_MODE);
 
-	wifi_softap_dhcps_stop();
-	if(wifi_set_ip_info(SOFTAP_IF, info1) == 1)        //设置AP模式下IP参数
-	{
-		DNS_SERVER_DEBUG("SetIP success\n");
-	}
-	else
-	{
-		DNS_SERVER_DEBUG("SetIP fail\n");
-	}
-	wifi_softap_dhcps_start();                 //开启AP模式下DHCP
-
-	os_timer_disarm(&test_timer);
-	os_timer_setfn(&test_timer, (os_timer_func_t *)user_check_ip, NULL);
-	os_timer_arm(&test_timer, 100, 0);
-
-}
 void ICACHE_FLASH_ATTR ConfigEsp82663(struct ip_info *info1)
 {
   uint32 DHCPstate;
@@ -189,15 +170,11 @@ void ICACHE_FLASH_ATTR vLink_AP(uint32 AP_ID)
 void ICACHE_FLASH_ATTR vGetStaticIP(uint8 mode)
 {
 	struct ip_info info;
-	uint32 IP_addr[4] = {0,0,0,0};      //用以存储解析好的IP地址
-	uint32 Subnet_mask[4] = {0,0,0,0};  //用以存储解析好的子网掩码
-	uint32 Gateway[4] = {0,0,0,0};      //用以存储解析好的网管
+	uint32 IP_addr[4] = {DEFAULT_AP_IP1,DEFAULT_AP_IP2,DEFAULT_AP_IP3,DEFAULT_AP_IP4};      // AP模式下固定IP
+	uint32 Subnet_mask[4] = {DEFAULT_AP_NETMASK1,DEFAULT_AP_NETMASK2,DEFAULT_AP_NETMASK3,DEFAULT_AP_NETMASK4}; //AP模式下固定IP
+	uint32 Gateway[4] = {DEFAULT_AP_GW1,DEFAULT_AP_GW2,DEFAULT_AP_GW3,DEFAULT_AP_GW4};      //AP模式下固定IP
     uint32 i,SSIDlen = 0,Pswdlen = 0,SSID[32],Pswd[32];
     char SSID1[32],Pswd1[32];
-
-	Spi_FlashRead(LOCAL_Erase,LOCAL_IP_ERASE_OFFSET,IP_addr,4);  //从flash中读取本地IP 网关 子网掩码
-	Spi_FlashRead(LOCAL_Erase,LOCAL_Mask_ERASE_OFFSET,Subnet_mask,4);
-	Spi_FlashRead(LOCAL_Erase,LOCAL_GATAWAY_ERASE_OFFSET,Gateway,4);
 
 	Spi_FlashRead(LOCALSSID_Erase,SSID_Len_ERASE_OFFSET,&SSIDlen,1);	//读取本地wifi名字的长度和密码的长度
 	Spi_FlashRead(LOCALSSID_Erase,PSWD_LEN_ERASE_OFFSET,&Pswdlen,1);
@@ -269,11 +246,12 @@ void ICACHE_FLASH_ATTR RecoveryData()
 	DefaultData.IsSetDST = DST_NO_SET;
 	DefaultData.TcpServerIP_Len = 0;
 	DefaultData.Language_state = LANGUAGE_EN;
-	DefaultData.IP[0] = 192;  DefaultData.IP[1] =168;DefaultData.IP[2] =75;DefaultData.IP[3] =100;
 
-	DefaultData.gw[0] = 192; DefaultData.gw[1] =168;DefaultData.gw[2] =75;DefaultData.gw[3] =100;
+	DefaultData.IP[0] = DEFAULT_STATION_IP1;  DefaultData.IP[1] =DEFAULT_STATION_IP2;DefaultData.IP[2] =DEFAULT_STATION_IP3;DefaultData.IP[3] =DEFAULT_STATION_IP4;
 
-	DefaultData.netmask[0] = 255;DefaultData.netmask[1] = 255;DefaultData.netmask[2] = 255;DefaultData.netmask[3] = 0;
+	DefaultData.gw[0] = DEFAULT_STATION_GW1; DefaultData.gw[1] =DEFAULT_STATION_GW2;DefaultData.gw[2] =DEFAULT_STATION_GW3;DefaultData.gw[3] =DEFAULT_STATION_GW4;
+
+	DefaultData.netmask[0] = DEFAULT_STATION_NETMASK1;DefaultData.netmask[1] = DEFAULT_STATION_NETMASK2;DefaultData.netmask[2] = DEFAULT_STATION_NETMASK3;DefaultData.netmask[3] = DEFAULT_STATION_NETMASK4;
 
 	DefaultData.NtpAppMode = NTP_MODE;
 

@@ -365,7 +365,7 @@
    " </table>"\
 "</form>"\
 	"<br><br>"\
-	"<p class=\"class3\">GX WIFI Tranmission NTP Time System 1.0</p>"\
+	"<p class=\"class3\">GX WIFI Tranmission NTP Time System 1.2</p>"\
 "</div>"\
 	"<script>"\
 	"window.onload =csan();"\
@@ -459,7 +459,6 @@ void ICACHE_FLASH_ATTR AP_tcpserver_init(u16 port);
 void ICACHE_FLASH_ATTR AP_tcpserverAPP_init(u16 port);
 void ICACHE_FLASH_ATTR tcp_server_recvApp_cb(void *arg, char *pusrdata, unsigned short length);
 void ICACHE_FLASH_ATTR tcp_serverApp_listen(void *arg);
-void ICACHE_FLASH_ATTR Get_StaticIP_Set2(char *StaticIP,char *Sub_Mask,char* Gate_way);
 void ICACHE_FLASH_ATTR GetIPData2(uint32 IP_addr[],char * IP_Point);
 void ICACHE_FLASH_ATTR user_dns_server_init();
 void ICACHE_FLASH_ATTR webserver_sent_cb(void *arg);
