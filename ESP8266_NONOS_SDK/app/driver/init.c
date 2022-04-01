@@ -224,9 +224,8 @@ void ICACHE_FLASH_ATTR RecoveryData()
 	AllSetData DefaultData;
 	//cn.ntp.org.cn
 	//118.24.4.66
-	uint32 NtpIP[13] = {'1','1','8','.','2','4','.','4','.','6','6','\0'};
-	//uint32 NtpIP[16] = {'c','n','.','n','t','p','.','o','r','g','.','c','n','\0'};
-	//uint32 Ssid[15] = {'G','x','L','E','D','S','_','S','N','T','P',0,0,0,'\0'};
+	char ntp_server_8[32] = {0};
+	uint32 ntp_server_32[32] = {0};
 	uint32 Ssid[14] = {'G','x','L','E','D','S','_','N','P',0,0,0,0,'\0'};
 	uint32 SsidPswd[9] = {'g','x','1','2','3','4','5','6','\0'};
 
@@ -234,6 +233,16 @@ void ICACHE_FLASH_ATTR RecoveryData()
 	spi_flash_erase_sector (FIRST_START_Erase);  //往FLASH里存入时区
 	spi_flash_write (FIRST_START_Erase*4*1024 + FIRST_START_ERASE_OFFSET, &SetDevideCount, 1 * 4);
 
+	DefaultData.NtpseverIPlen = os_sprintf(ntp_server_8,"%d.%d.%d.%d",DEFAULT_NTP_IP1,DEFAULT_NTP_IP2,DEFAULT_NTP_IP3,DEFAULT_NTP_IP4);
+
+	for(i = 0; i < DefaultData.NtpseverIPlen; i ++)
+	{
+		ntp_server_32[i] = (uint32)ntp_server_8[i];
+	}
+
+	DNS_SERVER_DEBUG("ntp server len = %d\n",DefaultData.NtpseverIPlen);
+	ntp_server_32[DefaultData.NtpseverIPlen] = '\0';
+	
 	wifi_get_macaddr(STATION_IF,yladdr);//查询MAC地址
 
 	Ssid[9] = yladdr[4] / 100 + 0x30;
@@ -258,12 +267,11 @@ void ICACHE_FLASH_ATTR RecoveryData()
 	DefaultData.SsidLen = 13;
 	DefaultData.SsidPswdLen = 0;
 
-	DefaultData.NtpseverIPlen = 11;
 	DefaultData.AP_num = NO_APID;
 	DefaultData.TimePutInterva = 10;
 	DefaultData.DHCP_State = DHCP_OPEN;
 	spi_flash_erase_sector (NTP_IP_Erase);  //往FLASH里存入NTP IP 信息
-	spi_flash_write (NTP_IP_Erase*4*1024 + NTP_IP_ERASE_OFFSET, NtpIP, DefaultData.NtpseverIPlen * 4);
+	spi_flash_write (NTP_IP_Erase*4*1024 + NTP_IP_ERASE_OFFSET, ntp_server_32, DefaultData.NtpseverIPlen * 4);
 	spi_flash_write (NTP_IP_Erase*4*1024 + NTP_IP_LEN_ERASE_OFFSET, &DefaultData.NtpseverIPlen, 1 * 4);
 
 	spi_flash_erase_sector (DST_Erase);  //往FLASH里存入夏令时 信息

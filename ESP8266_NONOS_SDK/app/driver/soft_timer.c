@@ -22,6 +22,19 @@ uint8 LinkAPstate;
 extern uint32 SysTime_ms;
 extern  uint8_t isLedClose;
 
+
+///获取wifi连接状态   1：已连接，0 未连接
+uint8_t get_wifi_connect_state(void)
+{
+	if(LinkAPstate == 1)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
 void ICACHE_FLASH_ATTR SetNtp()
 {
     int32 timezone1 = 0,NtpIpLen = 0;

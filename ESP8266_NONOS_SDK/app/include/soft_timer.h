@@ -1,7 +1,7 @@
 /*
  * soft_timer.h
  *
- *  Created on: 2019Äê7ÔÂ28ÈÕ
+ *  Created on: 2019å¹´7æœˆ28æ—¥
  *      Author: Administrator
  */
 
@@ -11,7 +11,7 @@
 #include "osapi.h"
 #include "user_interface.h"
 
-extern os_timer_t Init_timer,Check_SmartConfig,test_timer,sntpPutTime,LedCloseTime,TcpClientLink;  //¶¨ÒåÒ»¸ö¶¨Ê±Æ÷½á¹¹
+extern os_timer_t Init_timer,Check_SmartConfig,test_timer,sntpPutTime,LedCloseTime,TcpClientLink;  //å®šä¹‰ä¸€ä¸ªå®šæ—¶å™¨ç»“æž„
 extern int32 Init_Setup;
 extern uint32_t timerForLinkAP;
 extern uint8 LinkAPstate;
@@ -21,4 +21,5 @@ void ICACHE_FLASH_ATTR user_check_ip(void);
 void ICACHE_FLASH_ATTR Init_Set_up(void);
 void ICACHE_FLASH_ATTR SetNtp();
 void ICACHE_FLASH_ATTR IsTcpClientLink(void);
+uint8_t get_wifi_connect_state(void);
 #endif

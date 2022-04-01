@@ -44,7 +44,13 @@
 #define DEFAULT_AP_NETMASK3 255
 #define DEFAULT_AP_NETMASK4 0
 
-//#define GLOBAL_DEBUG
+//默认的NTP服务器
+#define DEFAULT_NTP_IP1 118
+#define DEFAULT_NTP_IP2  24
+#define DEFAULT_NTP_IP3   4
+#define DEFAULT_NTP_IP4  66
+
+#define GLOBAL_DEBUG
  
 #if defined(GLOBAL_DEBUG)
 #define DNS_SERVER_DEBUG(format, ...) os_printf("[%s:%d]" format "", __FILE__,__LINE__,##__VA_ARGS__)
