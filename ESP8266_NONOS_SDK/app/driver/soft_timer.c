@@ -23,6 +23,18 @@ extern uint32 SysTime_ms;
 extern  uint8_t isLedClose;
 
 
+/// 若检索到Ntp服务器的值是 auto，则将其转换为默认ntp服务器Ip
+void auto_ntp_server_ip_set(char *ntpserver,uint32 ntpserver_len, uint32 *ntpserver_len2)
+{
+	if((os_strcmp(ntpserver,AUTO_SELECT_NTP_STRING) == 0) || 
+		(os_strcmp(ntpserver,AUTO_SELECT_NTP_STRING1) == 0) ||
+		(os_strcmp(ntpserver,AUTO_SELECT_NTP_STRING2) == 0) )
+	{
+		os_memset(ntpserver,0,ntpserver_len);
+		*ntpserver_len2 = os_sprintf(ntpserver,"%d.%d.%d.%d",DEFAULT_NTP_IP1,DEFAULT_NTP_IP2,DEFAULT_NTP_IP3,DEFAULT_NTP_IP4);
+	}
+}
+
 ///获取wifi连接状态   1：已连接，0 未连接
 uint8_t get_wifi_connect_state(void)
 {
@@ -39,8 +51,8 @@ void ICACHE_FLASH_ATTR SetNtp()
 {
     int32 timezone1 = 0,NtpIpLen = 0;
     sint8 timezone =0;
-	uint32 i, Ntpsever[32];
-	char Ntpsever1[32] ;
+	uint32 i, Ntpsever[32] = {0};
+	char Ntpsever1[32] = {0};
 
 
 	 for(i = 0; i < 32; i++)
@@ -65,9 +77,12 @@ void ICACHE_FLASH_ATTR SetNtp()
 		   Ntpsever1[i] = (char)Ntpsever[i];
 		 }
 		 Ntpsever1[NtpIpLen] = '\0';
+
+		 DNS_SERVER_DEBUG("Ntpsever1 = %s\n", Ntpsever1);
+		 auto_ntp_server_ip_set(Ntpsever1,sizeof(Ntpsever1),&NtpIpLen);
 		 Sntp_Config(Ntpsever1,NtpIpLen);
 
-		 DNS_SERVER_DEBUG("sntp_get_timezone = %d\n", sntp_get_timezone());
+		 DNS_SERVER_DEBUG("sntp_get_timezone = %d,Ntpsever1 = %s\n", sntp_get_timezone(),Ntpsever1);
 	 }
 
 }

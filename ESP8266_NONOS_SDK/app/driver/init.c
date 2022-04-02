@@ -216,6 +216,7 @@ void ICACHE_FLASH_ATTR vGetStaticIP(uint8 mode)
 
 }
 
+
 void ICACHE_FLASH_ATTR RecoveryData()
 {
 	static struct ip_info info;
@@ -233,7 +234,7 @@ void ICACHE_FLASH_ATTR RecoveryData()
 	spi_flash_erase_sector (FIRST_START_Erase);  //往FLASH里存入时区
 	spi_flash_write (FIRST_START_Erase*4*1024 + FIRST_START_ERASE_OFFSET, &SetDevideCount, 1 * 4);
 
-	DefaultData.NtpseverIPlen = os_sprintf(ntp_server_8,"%d.%d.%d.%d",DEFAULT_NTP_IP1,DEFAULT_NTP_IP2,DEFAULT_NTP_IP3,DEFAULT_NTP_IP4);
+	DefaultData.NtpseverIPlen = os_sprintf(ntp_server_8,"%s",AUTO_SELECT_NTP_STRING);
 
 	for(i = 0; i < DefaultData.NtpseverIPlen; i ++)
 	{

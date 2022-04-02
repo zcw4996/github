@@ -1683,19 +1683,20 @@ void ICACHE_FLASH_ATTR SetNtpServer(char *Ntpserver,uint32 NtpseverLen)
 
 	 os_bzero(Ntpserver2,32);
 	 os_bzero(Ntpserver1,32);
-
+	DNS_SERVER_DEBUG("NtpseverLen = %d\n",NtpseverLen);
 	DNS_SERVER_DEBUG("Ntpserver1 = ");
 	for(i = 0; i < NtpseverLen; i ++)
 	{
 		Ntpserver1[i] = Ntpserver[i];
 		Ntpserver2[i] = (uint32)Ntpserver[i];
-		DNS_SERVER_DEBUG("%c",Ntpserver1[i]);
+		DNS_SERVER_DEBUG("%c,",Ntpserver1[i]);
 	}
 	Ntpserver1[NtpseverLen] = '\0';
 
 	spi_flash_erase_sector (NTP_IP_Erase);  //往FLASH里存入NTP IP 信息
 	spi_flash_write (NTP_IP_Erase*4*1024 + NTP_IP_ERASE_OFFSET, Ntpserver2, NtpseverLen * 4);
 	spi_flash_write (NTP_IP_Erase*4*1024 + NTP_IP_LEN_ERASE_OFFSET, &NtpseverLen, 1 * 4);
+	auto_ntp_server_ip_set(Ntpserver1,sizeof(Ntpserver1),&NtpseverLen);
 	Sntp_Config(Ntpserver1,NtpseverLen);
 	DNS_SERVER_DEBUG("\n");
 }
@@ -2164,7 +2165,7 @@ extern uint8 LastChannel;
 
 		   Language_Point = Language_Point + strlen("&language=");  /* 指向语言版本信息的值  */
 		   //把本地相关信息存入flash
-		 if((APName_len > 0) && (APPswd_len >= 0) && (NtpServerLen >= 7) && (SSIDlen > 0) && (SSIDlen <= 32) &&
+		 if((APName_len > 0) && (APPswd_len >= 0) && (NtpServerLen >= 7 || NtpServerLen == 4) && (SSIDlen > 0) && (SSIDlen <= 32) &&
 				 (TimeIntervaLen > 0 ) && (TimeIntervaLen <= 4 ) &&(TcpPortLen > 0)  &&(TcpPortLen <= 5))
 		 {
 			DNS_SERVER_DEBUG("Successfur SetUp\n");

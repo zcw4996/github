@@ -134,6 +134,7 @@
             "<td>Ntp Server: </td>"\
             "<td><input type=\"text\" value=\"%s\" onkeyup=\"value=value.replace(/[\\u4e00-\\u9fa5]/ig,\'\')\" name=\"Ntp_Serve\" style=\"width:154px;\" maxlength=\"20\" list=\"saleslist\">"\
               "<datalist id=\"saleslist\">"\
+                "<option>Auto</option>"\
                 "<option>118.24.4.66</option>"\
                 "<option>118.24.195.65</option>"\
                 "<option>58.220.133.132</option>"\

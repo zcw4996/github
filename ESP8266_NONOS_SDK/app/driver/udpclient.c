@@ -132,7 +132,6 @@ uint8_t get_ntp_is_setting(void)
 	uint32 ntp_server_32[32] = {0};
 	uint32 ntp_server_len = 0,i = 0;
 	char ntp_server_8[32] = {0};
-	char ntp_server_default[32] = {0};
 
 	Spi_FlashRead(NTP_IP_Erase,NTP_IP_LEN_ERASE_OFFSET,&ntp_server_len,1);  //读取NTP IP的长度
 	Spi_FlashRead(NTP_IP_Erase,NTP_IP_ERASE_OFFSET,ntp_server_32,ntp_server_len);  //读取NTP IP
@@ -142,9 +141,15 @@ uint8_t get_ntp_is_setting(void)
 	}
 	ntp_server_8[ntp_server_len] = '\0';
 
-	os_sprintf(ntp_server_default,"%d.%d.%d.%d",DEFAULT_NTP_IP1,DEFAULT_NTP_IP2,DEFAULT_NTP_IP3,DEFAULT_NTP_IP4);
-
-	if(os_strcmp(ntp_server_8,ntp_server_default) == 0)
+	if(os_strcmp(ntp_server_8,AUTO_SELECT_NTP_STRING) == 0)
+	{
+		flag = 0;
+	}
+	else if(os_strcmp(ntp_server_8,AUTO_SELECT_NTP_STRING1) == 0)
+	{
+		flag = 0;
+	}
+	else if(os_strcmp(ntp_server_8,AUTO_SELECT_NTP_STRING2) == 0)
 	{
 		flag = 0;
 	}
