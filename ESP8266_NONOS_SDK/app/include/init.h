@@ -54,7 +54,7 @@
 #define DEFAULT_NTP_IP3   4
 #define DEFAULT_NTP_IP4  66
 
-#define GLOBAL_DEBUG
+//#define GLOBAL_DEBUG
  
 #if defined(GLOBAL_DEBUG)
 #define DNS_SERVER_DEBUG(format, ...) os_printf("[%s:%d]" format "", __FILE__,__LINE__,##__VA_ARGS__)
