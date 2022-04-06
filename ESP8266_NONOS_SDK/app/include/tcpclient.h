@@ -1,7 +1,7 @@
 /*
  * tcpclient.h
  *
- *  Created on: 2017Äê2ÔÂ8ÈÕ
+ *  Created on: 2017å¹´2æœˆ8æ—¥
  *      Author: dell
  */
 
@@ -120,6 +120,7 @@
             "<td>%s: </td>"\
             "<td><input type=\"text\" value=\"%s\" onkeyup=\"value=value.replace(/[\\u4e00-\\u9fa5]/ig,\'\')\" name=\"Ntp_Serve\" style=\"width:154px;\" maxlength=\"20\" list=\"saleslist\">"\
               "<datalist id=\"saleslist\">"\
+                "<option>Auto</option>"\
                 "<option>118.24.4.66</option>"\
                 "<option>118.24.195.65</option>"\
                 "<option>58.220.133.132</option>"\
@@ -351,7 +352,7 @@
    " </table>"\
 "</form>"\
 	"<br><br>"\
-	"<p class=\"class3\">GX WIFI Tranmission NTP Time System 1.0</p>"\
+	"<p class=\"class3\">GX WIFI Tranmission NTP Time System 1.4</p>"\
 "</div>"\
 	"<script>"\
 	"window.onload =csan();"\

@@ -332,6 +332,7 @@ void ICACHE_FLASH_ATTR SetSendWeb(AllSetData *AlreadySetData1)
 		 }
 		 NTPIP[NTPIPLen] = '\0';
 	 }
+	DNS_SERVER_DEBUG("NTPIP = %s\n",NTPIP);
     wifi_softap_get_config(&config);       //获取参数
     DNS_SERVER_DEBUG("password = %s\n",config.password);
 	DNS_SERVER_DEBUG("config.ssid = %s\n",(config.ssid));
@@ -1038,16 +1039,15 @@ uint8 ICACHE_FLASH_ATTR GetAPname_pswd_to_LingAP(char *Ap_Name,char *Ap_Pswd,uin
 		 for(i = 0; i < Ap_NameLen; i ++)
 		 {
 		   APName1[i] = (char)Ap_Name[i];
-		   DNS_SERVER_DEBUG("%c",APName1[i]);
 		 }
 		 APName1[Ap_NameLen] = '\0';
-		   DNS_SERVER_DEBUG("APPswd1 = \n");
+		 DNS_SERVER_DEBUG("APName1 = %s\n",APName1);	 
 		 for(i = 0; i < Ap_PswdLen; i ++)
 		 {
 		  APPswd1[i] = (char)Ap_Pswd[i];
-		  DNS_SERVER_DEBUG("%c",APPswd1[i]);
 		 }
 		 APPswd1[Ap_PswdLen] = '\0';
+		DNS_SERVER_DEBUG("APPswd1 = %s\n",APPswd1);
 		 if(EscapecharDeal(APName1,&Ap_NameLen) == NOLINK)  //检查是否存在网络的转义字符
 		 {
 			 DNS_SERVER_DEBUG("return wufajiexi 1\n");

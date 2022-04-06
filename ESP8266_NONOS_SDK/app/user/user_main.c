@@ -33,7 +33,7 @@
 #include "soft_timer.h"
 #include "Rgbled.h"
 
-#define VERSION   "GX_NTP_CLOCK_V1.3_20220402"
+#define VERSION   "GX_NTP_CLOCK_V1.4_20220406"
 
 uint32 If_Init_Set;
 uint32 SetDevideCount; /*记录设置设备的次数  */
