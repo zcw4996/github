@@ -2224,7 +2224,7 @@ extern uint8 LastChannel;
 			   ((strstr( pusrdata, "captive.apple") != NULL)||
 			   (strstr( pusrdata, "connect.rom.miui") != NULL)||
 			   (strstr( pusrdata, "Safari") != NULL)||
-			   (strstr( pusrdata, "192.168.75.100") != NULL)||
+			   (strstr( pusrdata, "192.168.1.100") != NULL)||
 			   (strstr( pusrdata, "clients3.google") != NULL)))
 	   {
 

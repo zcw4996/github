@@ -366,7 +366,7 @@
    " </table>"\
 "</form>"\
 	"<br><br>"\
-	"<p class=\"class3\">GX WIFI Tranmission NTP Time System 1.4</p>"\
+	"<p class=\"class3\">GX WIFI Tranmission NTP Time System 1.5</p>"\
 "</div>"\
 	"<script>"\
 	"window.onload =csan();"\
